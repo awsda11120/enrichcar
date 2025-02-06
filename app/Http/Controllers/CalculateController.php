@@ -10,6 +10,7 @@ class CalculateController extends Controller
 {
     public function CalCosts($id)
     {
+        //test test
         // $selectedOptions = $request->input('options', []);
         $customer = DB::table('customers')->where('id', $id)->first();
         $car = DB::table('cars')->where('CusId', $id)->first();

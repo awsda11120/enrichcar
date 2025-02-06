@@ -9,6 +9,9 @@ use App\Http\Controllers\Car;
 
 class AdminController extends Controller
 {
+
+    //test test test
+    
     // public function index(Request $request)
     // {
     //     $types = [
