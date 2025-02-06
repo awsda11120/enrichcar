@@ -5,15 +5,11 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\CalculateController;
 use App\Http\Controllers\ChartController;
-<<<<<<< HEAD
-Route::get('/', [Admincontroller::class,'info']);
-=======
 
 // Route::get('/', [Admincontroller::class,'info']);
 Route::get('/', function () {
     return view('welcome');
 });
->>>>>>> bd00ce0178f227e797a30afa30b3a76e9b997aef
 
 
 Route::get('/customer', [AdminController::class,'customer'])->name('customer');
