@@ -17,4 +17,6 @@ class ChartController extends Controller
         // ส่งข้อมูลไปที่หน้า View
         return view('sum', compact('CarChart'));
     }
+
+    //ภาษาไทย
 }
