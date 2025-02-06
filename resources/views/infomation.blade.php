@@ -54,7 +54,7 @@
                                 <label for="total_year" class="form-label fw-bold"> อายุรถ(ปี):</label>
                                 <label class="form-label">{{ $total_year }}</label>
                             </div>
-                            
+
                             <div class="col-md-6">
                                 {{-- <label for="SelectOption" class="form-label fw-bold">การรับเอกสาร:</label> --}}
                                 {{-- <label for="SelectOption" class="form-label">การรับเอกสาร</label> --}}
@@ -97,7 +97,7 @@
                                             value="ต่อภาษี">
                                         <label class="form-check-label  " for="inlineCheckbox2">ต่อภาษี</label>
                                     </div>
-                                    
+
                                     {{-- <div class="form-check form-check-reverse ">
                                     <input class="form-check-input" type="checkbox" value="ต่อ พรบ." id="reverseCheck1">
                                     <label class="form-check-label" for="reverseCheck1">ต่อ พรบ.</label>
