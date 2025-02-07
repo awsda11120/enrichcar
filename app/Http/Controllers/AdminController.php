@@ -6,12 +6,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\Car;
+use Carbon\Carbon;
 
 class AdminController extends Controller
 {
 
     //test test test
-    
+
     // public function index(Request $request)
     // {
     //     $types = [
@@ -34,7 +35,7 @@ class AdminController extends Controller
     //         "category" => $category
     //     ]);
     // }
-    
+
     function showHis($id)
     {
         $car = DB::table('cars')->where('id', $id)->first();
@@ -51,16 +52,22 @@ class AdminController extends Controller
     {
         $customer = DB::table('customers')->where('id', $id)->first();
         $car = DB::table('cars')->where('CusId', $id)->first(); // ดึงข้อมูลรถที่เกี่ยวข้องกับลูกค้า
-        $total_year = session('total_year');
+        // $total_year = session('total_year');
+        $registrationDate = Carbon::parse($car->RegistrationDate);
+        $carYears = intval($registrationDate->diffInYears(Carbon::now()));
+        $months = intval($registrationDate->diffInMonths(Carbon::now()) % 12); // หาจำนวนเดือน
+
         // $insDate = DB::table('cars')->where('InsHistoryDate', '=', $id)->get();
         // $ind = date_create(date('d-m-Y',strtotime($insDate)));
         // $taxDate = DB::table('cars')->where('TaxHistoryDate', '=', $id)->get();
         // $txd = date_create(date('d-m-Y',strtotime($taxDate)));
         // $days =  session('days');
-        return view('infomation', compact('customer','car','total_year'));
+        return view('infomation', compact('customer','car','carYears', 'months'));
 
-        
+
     }
+
+
 
     // function renewCheck($id)
     // {
@@ -186,7 +193,7 @@ class AdminController extends Controller
     //     // return view('history',["his"=>$his]);
     //     return redirect('history');
     // }
-    
+
     // function InsView(){
     //     $List =  DB::table('cars as c')
     //              ->join('customers as cs','c.CusId','=','cs.id')
@@ -300,14 +307,14 @@ class AdminController extends Controller
         ]);
 
 
-       
+
     $carTypeId = DB::table('settings')
-    ->whereIn('category_key', ['car_type', 'car_brand'])  
-    ->where('name', '=', $requestInfo->InsuranceType) 
-    ->value('id');  
+    ->whereIn('category_key', ['car_type', 'car_brand'])
+    ->where('name', '=', $requestInfo->InsuranceType)
+    ->value('id');
 
     $carTaxId = DB::table('taxes')
-    ->where('name', '=', $requestInfo->TaxType) 
+    ->where('name', '=', $requestInfo->TaxType)
     ->value('id');
 
 
