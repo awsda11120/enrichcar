@@ -23,10 +23,7 @@
                         </div>
 
                         <div class="mb-3">
-                            <p><strong>ค่าภาษี (บาท) :</strong> --- </p>
-                        </div>
-                        <div class="mb-3">
-                            <p><strong>ค่าปรับภาษี (บาท) :</strong> --- </p>
+                            <p><strong>ค่าภาษี (บาท) :</strong> {{ $sum }} </p>
                         </div>
                         <div class="mb-3">
                             @foreach ($settRe as $setting)
