@@ -61,22 +61,19 @@ class AdminController extends Controller
     'c.CarCC','c.CarWeight','c.RegistrationDate')
     ->where('c.id', $id) 
     ->first();
-    // $total_year = session('total_year');
+    
+    $registrationDate = Carbon::parse($List->RegistrationDate);
+    $carYears = intval($registrationDate->diffInYears(Carbon::now()));
+    $months = intval($registrationDate->diffInMonths(Carbon::now()) % 12); // หาจำนวนเดือน
+
+    // return view('infomation', compact('customer','car','carYears', 'months'));
 
 
 
         $tax = $List->RegistrationDate;
         $ins = $List->InsHistoryDate;
 
-        // $info = Car::findOrFail($id);
-    
-        // $today = Carbon::today();
-    
-        // $prb_expire_date = Carbon::parse($info->RegistrationDate);
-        // $tax_expire_date = Carbon::parse($info->RegistrationDate);
-    
-        // $prb_days_left = $today->diffInDays($prb_expire_date, false);
-        // $tax_days_left = $today->diffInDays($tax_expire_date, false);
+        
 
             $register_day = date_create(date('Y-m-d',strtotime($tax)));
             $today = date_create(date('Y-m-d'));
@@ -88,8 +85,6 @@ class AdminController extends Controller
             $regArr[0] +=  $total_year;
             $regArr[0] +=  ($days>0) ? 1 : 0;
 
-            // repack renew day
-            // $List[$index]->renew = implode("/",array_reverse($regArr));
 
             //calculate days to renew from today
             $date_renew =  date_create(date('Y-m-d',strtotime(implode("-",$regArr))));
@@ -112,7 +107,7 @@ class AdminController extends Controller
            
 
         // return view('infomation', compact('customer','car','total_year'));
-        return view('infomation', compact('days_ins','days'),["list"=>$List]);
+        return view('infomation', compact('days_ins','days','carYears'),["list"=>$List]);
         
     }
 

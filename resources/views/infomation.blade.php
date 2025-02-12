@@ -54,6 +54,10 @@
                                 <label for="total_year" class="form-label fw-bold"> อายุรถ(ปี):</label>
                                 <label class="form-label">{{ $total_year }}</label>
                             </div> --}}
+                            <div class="col-md-6">
+                                <label for="total_year" class="form-label fw-bold">อายุรถ:</label>
+                                <label class="form-label">{{ $carYears }} ปี</label>
+                            </div>
 
                             <div class="col-md-6">
                                 {{-- <label for="SelectOption" class="form-label fw-bold">การรับเอกสาร:</label> --}}
@@ -97,10 +101,6 @@
                                     </div>
                                 </div>
                             </div>
-
-                           
-                    
-
 
                             {{-- <div class="container">
                                 <div class="row">
