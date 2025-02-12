@@ -12,7 +12,7 @@ class AdminController extends Controller
 {
 
     //test test test
-    
+
     // public function index(Request $request)
     // {
     //     $types = [
@@ -35,7 +35,7 @@ class AdminController extends Controller
     //         "category" => $category
     //     ]);
     // }
-    
+
     function showHis($id)
     {
         $car = DB::table('cars')->where('id', $id)->first();
@@ -115,6 +115,8 @@ class AdminController extends Controller
         return view('infomation', compact('days_ins','days'),["list"=>$List]);
         
     }
+
+
 
     // function renewCheck($id)
     // {
@@ -240,7 +242,7 @@ class AdminController extends Controller
     //     // return view('history',["his"=>$his]);
     //     return redirect('history');
     // }
-    
+
     // function InsView(){
     //     $List =  DB::table('cars as c')
     //              ->join('customers as cs','c.CusId','=','cs.id')
@@ -354,14 +356,14 @@ class AdminController extends Controller
         ]);
 
 
-       
+
     $carTypeId = DB::table('settings')
-    ->whereIn('category_key', ['car_type', 'car_brand'])  
-    ->where('name', '=', $requestInfo->InsuranceType) 
-    ->value('id');  
+    ->whereIn('category_key', ['car_type', 'car_brand'])
+    ->where('name', '=', $requestInfo->InsuranceType)
+    ->value('id');
 
     $carTaxId = DB::table('taxes')
-    ->where('name', '=', $requestInfo->TaxType) 
+    ->where('name', '=', $requestInfo->TaxType)
     ->value('id');
 
 
