@@ -14,11 +14,11 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="canonical" href="https://getbootstrap.com/docs/5.0/examples/sidebars/">
 
-        <link rel="stylesheet" href="//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">
-        <script src="//code.jquery.com/jquery-1.10.2.js"></script>
-        <script src="//code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
-        {{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> --}}
-        
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">
+    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="//code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
+    {{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> --}}
+
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&family=Roboto:wght@400;700&display=swap');
@@ -118,13 +118,40 @@
             padding: 1rem;
             padding-right: 2rem;
         }
+
         input[type="number"]::-webkit-outer-spin-button,
         input[type="number"]::-webkit-inner-spin-button {
             -webkit-appearance: none;
             margin: 0;
         }
+
+        /* td:not(.custom-color) {
+            background-color: white;
+        } */
+
+        .ins-red {
+            background-color: #FFCCCC !important;
+        }
+
+
+        .ins-yellow {
+            background-color: #FFFF99 !important;
+        }
+
+
+        .tax-red {
+            background-color: #FFCCCC !important;
+        }
+
+
+        .tax-yellow {
+            background-color: #FFFF99 !important;
+        }
+
+
+
         /* end add info form */
-        .errMsg ul li{
+        /* .errMsg ul li{
             list-style: none;
             color:#EC0000;
         }
@@ -146,7 +173,7 @@
         .ins_warning td {
             background:#63f3c1!important;
             color:#000;
-        }
+        } */
 
         /* .bg_danger {
     background-color: red !important;
@@ -160,8 +187,16 @@
     background-color: gray !important;
 } */
 
-        table.table-grid,table.table-grid thead tr th, table.table-grid tbody tr td{ border:#000 1px solid!important; }
-        table.table-grid thead tr th{   background:#F7CBC7!important;  }
+        table.table-grid,
+        table.table-grid thead tr th,
+        table.table-grid tbody tr td {
+            border: #000 1px solid !important;
+        }
+
+        table.table-grid thead tr th {
+            background: #F7CBC7 !important;
+        }
+
         /* //table.table-grid thead tr th{    height: 55px;  } */
 
 
@@ -190,21 +225,21 @@
         }
     </style>
     <script>
-         $(function() {
-        $( ".datepicker" ).datepicker({
-            changeMonth: true,
-            changeYear: true,
-            showButtonPanel: true,
-            dateFormat: 'yy-mm-dd'
+        $(function() {
+            $(".datepicker").datepicker({
+                changeMonth: true,
+                changeYear: true,
+                showButtonPanel: true,
+                dateFormat: 'yy-mm-dd'
+            });
         });
-    });
     </script>
 </head>
 
 <body style="background-color: #FDF5F4;">
     <nav class="navbar navbar-expand-lg" style="background-color: #F7CBC7;">
         <div class="container-fluid">
-            <a class="navbar-brand" href="/">EINS system</a>
+            <a class="navbar-brand" href="/info">EINS system</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -215,12 +250,18 @@
     <div class="row">
         <div class="col-2 p-3 ">
             <div class="sidebar">
-                <a href="/info" class="{{ request()->is('info') ? 'active' : '' }}"><i class="bi bi-car-front"></i> ข้อมูล</a>
-                <a href="/history" class="{{ request()->is('history') ? 'active' : '' }}"><i class="bi bi-clock-history"></i> ประวัติทำรายการ</a>
-                <a href="/tracknum" class="{{ request()->is('tracknum') ? 'active' : '' }}"><i class="bi bi-box-seam"></i> การรับเอกสาร</a>
-                <a href="/sum" class="{{ request()->is('sum') ? 'active' : '' }}"><i class="bi bi-bar-chart-line-fill"></i> สรุปขข้อมูล</a>
-                <a href="/settings/general" class="{{ request()->is('settings/general') ? 'active' : '' }}"><i class="bi bi-gear-wide-connected"></i> ตั้งค่าทั่วไป</a>
-                <a href="/settings/cost" class="{{ request()->is('settings/cost') ? 'active' : '' }}"><i class="bi bi-cash-coin"></i> ตั้งค่าค่าบริการ</a>
+                <a href="/info" class="{{ request()->is('info') ? 'active' : '' }}"><i class="bi bi-car-front"></i>
+                    ข้อมูล</a>
+                <a href="/history" class="{{ request()->is('history') ? 'active' : '' }}"><i
+                        class="bi bi-clock-history"></i> ประวัติทำรายการ</a>
+                <a href="/tracknum" class="{{ request()->is('tracknum') ? 'active' : '' }}"><i
+                        class="bi bi-box-seam"></i> การรับเอกสาร</a>
+                <a href="/sum" class="{{ request()->is('sum') ? 'active' : '' }}"><i
+                        class="bi bi-bar-chart-line-fill"></i> สรุปขข้อมูล</a>
+                <a href="/settings/general" class="{{ request()->is('settings/general') ? 'active' : '' }}"><i
+                        class="bi bi-gear-wide-connected"></i> ตั้งค่าทั่วไป</a>
+                <a href="/settings/cost" class="{{ request()->is('settings/cost') ? 'active' : '' }}"><i
+                        class="bi bi-cash-coin"></i> ตั้งค่าค่าบริการ</a>
             </div>
         </div>
         <div class="col-10 ">
@@ -233,4 +274,5 @@
     @yield('script')
     <div class="b-example-divider"></div>
 </body>
+
 </html>
