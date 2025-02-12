@@ -45,7 +45,7 @@ class AdminController extends Controller
         // ->get();
         return view('history',compact('car'));
     }
-    
+
 
 
 
@@ -59,9 +59,9 @@ class AdminController extends Controller
     ->select('c.id','c.BookOwner', 'cs.CustomerName','cs.NationalID','cs.PhoneNumber',
     'cs.Address','c.SelectOption','c.TaxHistoryDate','c.InsHistoryDate','c.TaxId',
     'c.CarCC','c.CarWeight','c.RegistrationDate')
-    ->where('c.id', $id) 
+    ->where('c.id', $id)
     ->first();
-    
+
     $registrationDate = Carbon::parse($List->RegistrationDate);
     $carYears = intval($registrationDate->diffInYears(Carbon::now()));
     $months = intval($registrationDate->diffInMonths(Carbon::now()) % 12); // หาจำนวนเดือน
@@ -73,7 +73,7 @@ class AdminController extends Controller
         $tax = $List->RegistrationDate;
         $ins = $List->InsHistoryDate;
 
-        
+
 
             $register_day = date_create(date('Y-m-d',strtotime($tax)));
             $today = date_create(date('Y-m-d'));
@@ -104,11 +104,11 @@ class AdminController extends Controller
             echo"<br>".$days_ins."=>".$days;
 
 
-           
+
 
         // return view('infomation', compact('customer','car','total_year'));
         return view('infomation', compact('days_ins','days','carYears'),["list"=>$List]);
-        
+
     }
 
 
@@ -176,20 +176,20 @@ class AdminController extends Controller
             // $List[$index]->disabled = ($days_ins<=$d_danger) ? "" : "disabled" ;
             // echo"<br>".$diff;
             //  echo"<br>".$days_ins."=>".$days;
-            if ($days <= $d_danger) {
-                $List[$index]->cls = "bg_danger";
-            } elseif ($days > $d_danger && $days <= $d_warning) {
-                $List[$index]->cls = "bg_warning";
-            }
+            // if ($days <= $d_danger) {
+            //     $List[$index]->cls = "bg_danger";
+            // } elseif ($days > $d_danger && $days <= $d_warning) {
+            //     $List[$index]->cls = "bg_warning";
+            // }
 
-            elseif ($days_ins <= $ins_danger) {
-                $List[$index]->cls = "ins_danger";
-            } elseif ($days_ins > $ins_danger && $days_ins <= $ins_warning) {
-                $List[$index]->cls = "ins_warning";
-            } else {
-                $List[$index]->cls = ""; // no class if it doesn't match the conditions
-                // $List[$index]->cls = ""; // no class if it doesn't match the conditions
-            }
+            // elseif ($days_ins <= $ins_danger) {
+            //     $List[$index]->cls = "ins_danger";
+            // } elseif ($days_ins > $ins_danger && $days_ins <= $ins_warning) {
+            //     $List[$index]->cls = "ins_warning";
+            // } else {
+            //     $List[$index]->cls = ""; // no class if it doesn't match the conditions
+            //     // $List[$index]->cls = ""; // no class if it doesn't match the conditions
+            // }
 
         }
 
