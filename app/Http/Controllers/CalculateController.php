@@ -10,18 +10,33 @@ class CalculateController extends Controller
 {
     public function CalCosts($id)
     {
+        $data = DB::table('cars as c')
+        ->join('customers as cs', 'c.CusId','=', 'cs.id')
+        ->join('settings_renew as sr', 'sr.cartype_id','=', 'c.TypeID')
+        ->select('c.id','c.BookOwner', 'cs.CustomerName','cs.NationalID','cs.PhoneNumber',
+        'cs.Address','c.SelectOption','c.TaxHistoryDate','c.InsHistoryDate','c.TaxId',
+        'c.CarCC','c.CarWeight','c.InsuranceType','c.TypeId','sr.renew_cost','sr.fee','sr.delivery_cost')
+        ->where('c.id', $id)
+        ->first();
 
         // $selectedOptions = $request->input('options', []);
-        $customer = DB::table('customers')->where('id', $id)->first();
-        $car = DB::table('cars')->where('CusId', $id)->first();
-        $settRe = DB::table('settings_renew')->get();
-        $tax = DB::table('cars')->where('CusId', $id)->value('TaxId');
-        $cc = DB::table('cars')->where('CusId', $id)->value('CarCC');
-        $weight = DB::table('cars')->where('CusId', $id)->value('CarWeight');
+        // $customer = DB::table('customers')->where('id', $id)->first();
+        // $car = DB::table('cars')->where('CusId', $id)->first();
+        // $settRe = DB::table('settings_renew')->get();
+        // $tax = DB::table('cars')->where('CusId', $id)->value('TaxId');
+        // $cc = DB::table('cars')->where('CusId', $id)->value('CarCC');
+        // $weight = DB::table('cars')->where('CusId', $id)->value('CarWeight');
         
         // $type = DB::table('cars')->where('TypeId', "=", $id)->value('TypeId');
         // echo $tax;
         // echo $cc;
+
+        $tax = $data->TaxId;
+        $cc = $data->CarCC;
+        $weight = $data->CarWeight;
+        $rn = $data->renew_cost;
+        $f = $data->fee;
+        $del = $data->delivery_cost;
 
         $sum = 0;
         if($tax == 1){
@@ -60,11 +75,14 @@ class CalculateController extends Controller
                 $sum = 1600;
             }
         }
+        $sum_cost = 0;
+        $sum_cost += $sum+$rn+$f+$del;
 
 
         // echo $tax ,"+" ,$cc ,"+", $weight, "+" ,$sum;
-        
-        return view('CheckCosts', compact('customer','car','settRe','sum'));
+        return view('CheckCosts', compact('sum','sum_cost'),["data"=>$data]);
+        // return view('CheckCosts', compact('customer','car','settRe','sum'));
+       
 
         // $List =  DB::table('setting_renews as sr')
         // ->join('cars as c','c.id','=','sr.id')

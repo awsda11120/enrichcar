@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\Car;
+use Carbon\Carbon;
 
 class AdminController extends Controller
 {
@@ -44,21 +45,74 @@ class AdminController extends Controller
         // ->get();
         return view('history',compact('car'));
     }
+    
 
 
 
     function showIn($id)
     {
-        $customer = DB::table('customers')->where('id', $id)->first();
-        $car = DB::table('cars')->where('CusId', $id)->first(); // ดึงข้อมูลรถที่เกี่ยวข้องกับลูกค้า
-        $total_year = session('total_year');
-        // $insDate = DB::table('cars')->where('InsHistoryDate', '=', $id)->get();
-        // $ind = date_create(date('d-m-Y',strtotime($insDate)));
-        // $taxDate = DB::table('cars')->where('TaxHistoryDate', '=', $id)->get();
-        // $txd = date_create(date('d-m-Y',strtotime($taxDate)));
-        // $days =  session('days');
-        return view('infomation', compact('customer','car','total_year'));
+        // $customer = DB::table('customers')->where('id', $id)->first();
+        // $car = DB::table('cars')->where('id', $id)->first(); // ดึงข้อมูลรถที่เกี่ยวข้องกับลูกค้า
+        // $total_year = session('total_year');
+    $List = DB::table('cars as c')
+    ->join('customers as cs', 'c.CusId', '=', 'cs.id')
+    ->select('c.id','c.BookOwner', 'cs.CustomerName','cs.NationalID','cs.PhoneNumber',
+    'cs.Address','c.SelectOption','c.TaxHistoryDate','c.InsHistoryDate','c.TaxId',
+    'c.CarCC','c.CarWeight','c.RegistrationDate')
+    ->where('c.id', $id) 
+    ->first();
+    // $total_year = session('total_year');
 
+
+
+        $tax = $List->RegistrationDate;
+        $ins = $List->InsHistoryDate;
+
+        // $info = Car::findOrFail($id);
+    
+        // $today = Carbon::today();
+    
+        // $prb_expire_date = Carbon::parse($info->RegistrationDate);
+        // $tax_expire_date = Carbon::parse($info->RegistrationDate);
+    
+        // $prb_days_left = $today->diffInDays($prb_expire_date, false);
+        // $tax_days_left = $today->diffInDays($tax_expire_date, false);
+
+            $register_day = date_create(date('Y-m-d',strtotime($tax)));
+            $today = date_create(date('Y-m-d'));
+            $diff = date_diff($register_day,$today);
+            $days = (int)$diff->format('%a')%365;     // เศษวัน
+            $total_year = floor((int)$diff->format('%a')/365);           // $regArr[1] = month
+            $regArr = explode("-",$tax);  // y , m , d =>$regArr[2] = day
+            // update year
+            $regArr[0] +=  $total_year;
+            $regArr[0] +=  ($days>0) ? 1 : 0;
+
+            // repack renew day
+            // $List[$index]->renew = implode("/",array_reverse($regArr));
+
+            //calculate days to renew from today
+            $date_renew =  date_create(date('Y-m-d',strtotime(implode("-",$regArr))));
+            $due_date_diff = date_diff($today,$date_renew);
+            $days = (int)$due_date_diff->format('%a')%365;
+            // $List[$index]->days = $days;
+            // $List[$index]->cls = ($days<=$d_danger) ? "bg_danger" : (($days>$d_danger&&$days<=$d_warning) ? "bg_warning" : "") ;
+            // $List[$index]->disabled = ($days<=$d_danger) ? "" : "disabled" ;
+            $date = (date('Y-m-d',strtotime($ins))); // Replace with your date
+            $newDate = date('d/m/Y', strtotime('+365 days', strtotime($date)));
+            // $List[$index]->next_Ins = $newDate;
+            $ins = date('Y-m-d',strtotime('+365 days', strtotime($date)));
+            $ins = date_create($ins);
+            $diff_ins = date_diff($today,$ins);
+            $days_ins = (int)$diff_ins->format('%a')%365;
+
+            echo"<br>".$days_ins."=>".$days;
+
+
+           
+
+        // return view('infomation', compact('customer','car','total_year'));
+        return view('infomation', compact('days_ins','days'),["list"=>$List]);
         
     }
 
@@ -83,7 +137,7 @@ class AdminController extends Controller
     function info(){
         $List =  DB::table('cars as c')
                  ->join('customers as cs','c.CusId','=','cs.id')
-                 ->select('c.CarNumber','c.RegistrationDate','c.InsHistoryDate','cs.CustomerName','cs.PhoneNumber','cs.id','c.BookOwner')
+                 ->select('c.CarNumber','c.RegistrationDate','c.InsHistoryDate','cs.CustomerName','cs.PhoneNumber','cs.id','c.BookOwner','c.id')
                  ->get();
 
         // calculate to renew ins

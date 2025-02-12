@@ -17,7 +17,7 @@
         <link rel="stylesheet" href="//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">
         <script src="//code.jquery.com/jquery-1.10.2.js"></script>
         <script src="//code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        {{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> --}}
         
 
     <style>
@@ -136,6 +136,9 @@
             background:#ffe658!important;
             color:#000;
         }
+        .exp {
+            background-color: gray !important;
+        }
         .ins_danger td {
             background:#ccb5e2!important;
             color:#000;
@@ -144,6 +147,18 @@
             background:#63f3c1!important;
             color:#000;
         }
+
+        /* .bg_danger {
+    background-color: red !important;
+}
+
+.bg_warning {
+    background-color: yellow !important;
+}
+
+.exp {
+    background-color: gray !important;
+} */
 
         table.table-grid,table.table-grid thead tr th, table.table-grid tbody tr td{ border:#000 1px solid!important; }
         table.table-grid thead tr th{   background:#F7CBC7!important;  }

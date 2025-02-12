@@ -12,23 +12,23 @@
                         <h5 class="mb-0">ข้อมูลลูกค้า</h5>
                     </div>
                     <div class="card-body">
-                        @if ($customer)
+                        @if ($list)
                             <div class="row g-4">
                                 <div class="col-md-6">
                                     <label for="CustomerName" class="form-label fw-bold">ชื่อและนามสกุล:</label>
-                                    <p class="form-text">{{ $customer->CustomerName }}</p>
+                                    <p class="form-text">{{ $list->CustomerName }}</p>
                                 </div>
                                 <div class="col-md-6">
                                     <label for="NationalID" class="form-label fw-bold">เลขบัตรประชาชน:</label>
-                                    <p class="form-text">{{ $customer->NationalID }}</p>
+                                    <p class="form-text">{{ $list->NationalID }}</p>
                                 </div>
                                 <div class="col-md-6">
                                     <label for="PhoneNumber" class="form-label fw-bold">เบอร์โทร:</label>
-                                    <p class="form-text">{{ $customer->PhoneNumber }}</p>
+                                    <p class="form-text">{{ $list->PhoneNumber }}</p>
                                 </div>
                                 <div class="col-md-6">
                                     <label for="Address" class="form-label fw-bold">ที่อยู่ปัจจุบัน:</label>
-                                    <p class="form-text">{{ $customer->Address }}</p>
+                                    <p class="form-text">{{ $list->Address }}</p>
                                 </div>
                             </div>
                         @else
@@ -44,17 +44,17 @@
                     </div>
                     <div class="card-body">
                         <div class="row g-4">
-                            @if ($car->BookOwner)
-                                <img src="/upload/doc/{{ $car->BookOwner }}" alt="Image"
+                            @if ($list->BookOwner)
+                                <img src="/upload/doc/{{ $list->BookOwner }}" alt="Image"
                                     class="img-fluid rounded shadow-sm" style="max-width: 100%; height: auto;">
                             @else
                                 <p class="text-center text-danger fw-bold">ไม่มีข้อมูลรถ</p>
                             @endif
-                            <div class="col-md-6">
+                            {{-- <div class="col-md-6">
                                 <label for="total_year" class="form-label fw-bold"> อายุรถ(ปี):</label>
                                 <label class="form-label">{{ $total_year }}</label>
-                            </div>
-                            
+                            </div> --}}
+
                             <div class="col-md-6">
                                 {{-- <label for="SelectOption" class="form-label fw-bold">การรับเอกสาร:</label> --}}
                                 {{-- <label for="SelectOption" class="form-label">การรับเอกสาร</label> --}}
@@ -64,7 +64,7 @@
                                     <option>จัดส่งตามที่อยู่</option>
                                 </select> --}}
                                 <label for="SelectOption" class="form-label fw-bold">การรับเอกสาร :</label>
-                                <label class="form-label">{{ $car->SelectOption }}</label>
+                                <label class="form-label">{{ $list->SelectOption }}</label>
                                 {{-- @error('SelectOption')
                                     <div class="my-1">
                                         <span class="text-danger">{{ $message }}</span>
@@ -75,53 +75,89 @@
                             <div class="col-md-6">
                                 <label for="TaxHistoryDate" class="form-label fw-bold"> ต่อภาษีครั้งล่าสุด:</label>
                                 <label class="form-label">
-                                    {{ \Carbon\Carbon::parse($car->TaxHistoryDate)->format('d/m/Y') }}
+                                    {{ \Carbon\Carbon::parse($list->TaxHistoryDate)->format('d/m/Y') }}
                                 </label>
                             </div>
                             <div class="col-md-6">
                                 <label for="InsHistoryDate" class="form-label fw-bold">ต่อ พรบ. ครั้งล่าสุด:</label>
                                 <label class="form-label">
-                                    {{ \Carbon\Carbon::parse($car->InsHistoryDate)->format('d/m/Y') }}
+                                    {{ \Carbon\Carbon::parse($list->InsHistoryDate)->format('d/m/Y') }}
                                 </label>
                             </div>
-
                             <div class="container">
                                 <div class="row">
                                     <div class="form-check form-check col-md-3 offset-md-10">
-                                        <input class="form-check-input  " type="checkbox" id="inlineCheckbox1"
-                                            value="ต่อ พรบ.">
-                                        <label class="form-check-label  " for="inlineCheckbox1">ต่อ พรบ.</label>
+                                        <input type="checkbox" name="renew_prb" value="1"
+                                            @if ($days_ins > 90) disabled @endif> ต่อ พ.ร.บ.
                                     </div>
-                                    <div class="form-check form-check  col-md-3 offset-md-10">
-                                        <input class="form-check-input  " type="checkbox" id="inlineCheckbox2"
-                                            value="ต่อภาษี">
-                                        <label class="form-check-label  " for="inlineCheckbox2">ต่อภาษี</label>
+                                    <div class="form-check form-check col-md-3 offset-md-10">
+                                        <input type="checkbox" name="renew_tax" value="1"
+                                            @if ($days > 90) disabled @endif> ต่อภาษี
+
                                     </div>
-                                    
-                                    {{-- <div class="form-check form-check-reverse ">
-                                    <input class="form-check-input" type="checkbox" value="ต่อ พรบ." id="reverseCheck1">
-                                    <label class="form-check-label" for="reverseCheck1">ต่อ พรบ.</label>
-                                </div>
-                                <div class="form-check form-check-reverse ">
-                                    <input class="form-check-input" type="checkbox" value="ต่อ พรบ." id="reverseCheck1">
-                                    <label class="form-check-label" for="reverseCheck1">ต่อภาษี</label>
-                                </div> --}}
                                 </div>
                             </div>
+
+                           
+                    
+
+
+                            {{-- <div class="container">
+                                <div class="row">
+                                    <div class="form-check form-check col-md-3 offset-md-10">
+                                        <input class="form-check-input" type="checkbox" id="inlineCheckbox1"
+                                            value="ต่อ พรบ." disabled>
+                                        <label class="form-check-label" for="inlineCheckbox1">ต่อ พรบ.</label>
+                                    </div>
+                                    <div class="form-check form-check col-md-3 offset-md-10">
+                                        <input class="form-check-input" type="checkbox" id="inlineCheckbox2" value="ต่อภาษี"
+                                            disabled>
+                                        <label class="form-check-label" for="inlineCheckbox2">ต่อภาษี</label>
+                                    </div>
+                                </div>
+                            </div> --}}
                         </div>
                     </div>
 
                 </div>
-
-
                 <div class="d-flex justify-content-between align-items-center">
                     <a href="/info" class="btn my-3" style="background-color:#9fdffa"> กลับ</a>
-                    <a href="{{ route('editInfo', $customer->id, $car->id) }}" class="btn my-3"
+                    <a href="/info" class="btn my-3"
                         style="background-color:#F0DF2A">แก้ไข</a>
-                    <a href="{{ route('CheckCosts', $customer->id, $car->id) }}" class="btn my-3"
+                    <a href="{{ route('CheckCosts', ['id' => $list->id]) }}" class="btn my-3"
                         style="background-color:#A4F02A">ดำเนินการ</a>
                 </div>
             </div>
         </div>
     </div>
 @endsection
+{{-- 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // ฟังก์ชันตรวจสอบว่า พ.ร.บ. หรือภาษีหมดอายุใน 90 วันหรือไม่
+        function checkExpiration() {
+            let insExpiring = "{{ \Carbon\Carbon::parse($car->next_Ins)->diffInDays(now()) <= 90 }}";
+            let taxExpiring = "{{ \Carbon\Carbon::parse($car->renew)->diffInDays(now()) <= 90 }}";
+
+            // ถ้า พ.ร.บ. หมดอายุภายใน 90 วัน, สามารถติ๊กได้
+            if (insExpiring === "1") {
+                $('#inlineCheckbox1').prop('disabled', false); // ทำให้สามารถติ๊กได้
+            } else {
+                $('#inlineCheckbox1').prop('disabled', true); // ทำให้ไม่สามารถติ๊กได้
+            }
+
+            // ถ้าภาษีหมดอายุภายใน 90 วัน, สามารถติ๊กได้
+            if (taxExpiring === "1") {
+                $('#inlineCheckbox2').prop('disabled', false); // ทำให้สามารถติ๊กได้
+            } else {
+                $('#inlineCheckbox2').prop('disabled', true); // ทำให้ไม่สามารถติ๊กได้
+            }
+        }
+
+        // เรียกฟังก์ชันเมื่อตรวจสอบข้อมูล
+        checkExpiration();
+    });
+</script>
+
+@endsection --}}
