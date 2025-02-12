@@ -88,45 +88,40 @@
                                     {{ \Carbon\Carbon::parse($list->InsHistoryDate)->format('d/m/Y') }}
                                 </label>
                             </div>
-                            <div class="container">
-                                <div class="row">
-                                    <div class="form-check form-check col-md-3 offset-md-10">
-                                        <input type="checkbox" name="renew_prb" value="1"
-                                            @if ($days_ins > 90) disabled @endif> ต่อ พ.ร.บ.
-                                    </div>
-                                    <div class="form-check form-check col-md-3 offset-md-10">
-                                        <input type="checkbox" name="renew_tax" value="1"
-                                            @if ($days > 90) disabled @endif> ต่อภาษี
 
-                                    </div>
-                                </div>
-                            </div>
-
-                            {{-- <div class="container">
-                                <div class="row">
-                                    <div class="form-check form-check col-md-3 offset-md-10">
-                                        <input class="form-check-input" type="checkbox" id="inlineCheckbox1"
-                                            value="ต่อ พรบ." disabled>
-                                        <label class="form-check-label" for="inlineCheckbox1">ต่อ พรบ.</label>
-                                    </div>
-                                    <div class="form-check form-check col-md-3 offset-md-10">
-                                        <input class="form-check-input" type="checkbox" id="inlineCheckbox2" value="ต่อภาษี"
-                                            disabled>
-                                        <label class="form-check-label" for="inlineCheckbox2">ต่อภาษี</label>
-                                    </div>
-                                </div>
-                            </div> --}}
                         </div>
                     </div>
 
                 </div>
-                <div class="d-flex justify-content-between align-items-center">
+                <form action="{{ route('saveRenewHistory',['id' => $list->id]) }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="id" value="{{ $list->id }}">
+                    <div class="container">
+                        <div class="row">
+                            <div class="form-check form-check col-md-3 offset-md-10">
+                                <input type="checkbox" name="renew_prb" value="1"
+                                    @if ($days_ins > 90) disabled @endif> ต่อ พ.ร.บ.
+                            </div>
+                            <div class="form-check form-check col-md-3 offset-md-10">
+                                <input type="checkbox" name="renew_tax" value="1"
+                                    @if ($days > 90) disabled @endif> ต่อภาษี
+                            </div>
+                        </div>
+                    </div>
+                
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a href="/info" class="btn my-3" style="background-color:#9fdffa"> กลับ</a>
+                        <a href="/info" class="btn my-3" style="background-color:#F0DF2A">แก้ไข</a>
+                        <button type="submit" class="btn my-3" style="background-color:#A4F02A">ดำเนินการ</button>
+                    </div>
+                </form>
+                {{-- <div class="d-flex justify-content-between align-items-center">
                     <a href="/info" class="btn my-3" style="background-color:#9fdffa"> กลับ</a>
                     <a href="/info" class="btn my-3"
                         style="background-color:#F0DF2A">แก้ไข</a>
                     <a href="{{ route('CheckCosts', ['id' => $list->id]) }}" class="btn my-3"
                         style="background-color:#A4F02A">ดำเนินการ</a>
-                </div>
+                </div> --}}
             </div>
         </div>
     </div>

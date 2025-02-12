@@ -12,6 +12,7 @@ class History extends Model
         'CarId',
         'DateRenew',
         'TypeRenew',
-        'Receive'
+        'Receive',
+        'ProofOfReceive'
     ];
 }

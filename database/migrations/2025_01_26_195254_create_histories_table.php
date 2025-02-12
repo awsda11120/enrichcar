@@ -14,9 +14,10 @@ return new class extends Migration
         Schema::create('histories', function (Blueprint $table) {
             $table->id();
             $table->string('CarId');
-            $table->date('DateRenew');
+            $table->date('DateRenew')->nullable();
             $table->string('TypeRenew');
             $table->string('Receive');
+            $table->string('ProofOfReceive')->nullable();
             $table->timestamps();
         });
     }

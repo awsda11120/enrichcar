@@ -48,5 +48,7 @@ Route::get('/sum', [ChartController::class, 'CarChart']);
 
 
 
+Route::post('/save-renew-history/{id}', [AdminController::class, 'saveRenewHistory'])->name('saveRenewHistory');
+
 
 

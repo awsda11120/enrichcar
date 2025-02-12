@@ -11,30 +11,52 @@ use Carbon\Carbon;
 class AdminController extends Controller
 {
 
-    //test test test
+    public function saveRenewHistory(Request $request ,$id)
+{
+    $data = DB::table('cars as c')
+        ->join('customers as cs', 'c.CusId','=', 'cs.id')
+        ->join('settings_renew as sr', 'sr.cartype_id','=', 'c.TypeID')
+        ->select('c.id','c.BookOwner', 'cs.CustomerName','cs.NationalID','cs.PhoneNumber',
+        'cs.Address','c.SelectOption','c.TaxHistoryDate','c.InsHistoryDate','c.TaxId',
+        'c.CarCC','c.CarWeight','c.InsuranceType','c.TypeId','sr.renew_cost','sr.fee','sr.delivery_cost')
+        ->where('c.id', $id)
+        ->first();
+        
+        $rc = $data->SelectOption;
 
-    // public function index(Request $request)
-    // {
-    //     $types = [
-    //         "info_last" => "ดูข้อมูลจากที่เพิ่มล่าสุด",
-    //         "info_Ins" => "ดูข้อมูลจาก พ.ร.บ. ที่กำลังจะหมดอายุ",
-    //         "info_Tax" => "ดูข้อมูลจากภาษีที่กำลังจะหมดอายุ"
-    //     ];
+    // ตรวจสอบว่ามีการติ๊กตัวเลือกไหนบ้าง
+    $renew_prb = $request->has('renew_prb') ? 'พ.ร.บ.' : null;
+    $renew_tax = $request->has('renew_tax') ? 'ภาษี' : null;
 
-    //     $obj = DB::table($this->tblSett)
-    //             ->select(["id","category_key as key","name"]);
-    //     if($category){
-    //         $obj->where('category_key',$category);
-    //     }
-    //     $list = $obj->orderBy('category_key', 'asc')
-    //             ->orderBy('name', 'asc')
-    //             ->get();
-    //     return view('setting_general',[
-    //         "list"=>$list,
-    //         "types"=>$types,
-    //         "category" => $category
-    //     ]);
-    // }
+    // ตรวจสอบว่ามีการเลือกต่ออายุอะไรบ้าง
+    $typeRenew = [];
+    if ($renew_prb) $typeRenew[] = $renew_prb;
+    if ($renew_tax) $typeRenew[] = $renew_tax;
+
+    // ถ้าไม่มีการเลือกต่ออายุ ไม่ต้องบันทึกข้อมูล
+    if (empty($typeRenew)) {
+        return redirect()->back()->with('error', 'กรุณาเลือกประเภทการต่ออายุ');
+    }
+
+    // $dataData = DB::table('histories');
+
+    
+
+    // บันทึกลงฐานข้อมูล
+    $dataData=[
+        'CarId' => $request->id, // บันทึก Car ID ที่ส่งมาจากฟอร์ม
+        'DateRenew' => null, // บันทึกวันที่ทำรายการ
+        'TypeRenew' => implode(', ', $typeRenew), // บันทึกประเภทการต่ออายุ (พรบ. หรือ ภาษี)
+        'Receive' => $rc, // บันทึกการรับเอกสาร
+        'ProofOfReceive' => null, // ยังไม่มีหลักฐานการรับ
+    ];
+
+    DB::table('histories')->insert($dataData);
+
+    return redirect()->route('CheckCosts', ['id' => $data->id]);
+}
+
+    
 
     function showHis($id)
     {
@@ -113,24 +135,7 @@ class AdminController extends Controller
 
 
 
-    // function renewCheck($id)
-    // {
-    //     $customer = DB::table('customers')->where('id', $id)->first();
-    //     $car = DB::table('cars')->where('id', $id)->first();
-    //     return view('CheckRenew', compact('customer','car'));
-
-    // }
-    // function customer()
-    // {
-    //     $customers = DB::table('customers')->get();
-    //     return view('infomation', compact('customers'));
-    // }
-    // function car()
-    // {
-    //     $cars = DB::table('cars')->get();
-    //     return view('car', compact('cars'));
-    // }
-
+    
     function info(){
         $List =  DB::table('cars as c')
                  ->join('customers as cs','c.CusId','=','cs.id')
@@ -229,61 +234,7 @@ class AdminController extends Controller
         return view('info',["list"=>$List]);
 
     }
-    // function history(){
-    //     $his = DB::table('histories as his')
-    //     ->join('cars','his.CarID','=','cars.id')
-    //     ->select('cars.CarNumber','cars.BookOwner','cars.SelectOption')
-    //     ->get();
-    //     // return view('history',["his"=>$his]);
-    //     return redirect('history');
-    // }
-
-    // function InsView(){
-    //     $List =  DB::table('cars as c')
-    //              ->join('customers as cs','c.CusId','=','cs.id')
-    //              ->select('c.CarNumber','c.RegistrationDate','c.InsHistoryDate','cs.CustomerName','cs.PhoneNumber','cs.id')
-    //              ->get();
-
-    //     // calculate to renew ins
-    //     // foreach ($List as $index => $item) {
-    //     //     $d_warning = 60;
-    //     //     $d_danger = 30;
-
-    //     //     $register_day = date_create(date('Y-m-d',strtotime($item->RegistrationDate)));
-    //     //     $today = date_create(date('Y-m-d'));
-    //     //     $diff = date_diff($register_day,$today);
-    //     //     $days = (int)$diff->format('%a')%365;     // เศษวัน
-    //     //     $total_year = floor((int)$diff->format('%a')/365);           // $regArr[1] = month
-    //     //     $regArr = explode("-",$item->RegistrationDate);  // y , m , d =>$regArr[2] = day
-    //     //     // update year
-    //     //     $regArr[0] +=  $total_year;
-    //     //     $regArr[0] +=  ($days>0) ? 1 : 0;
-
-    //     //     // repack renew day
-    //     //     $List[$index]->renew = implode("/",array_reverse($regArr));
-
-    //     //     //calculate days to renew from today
-    //     //     $date_renew =  date_create(date('Y-m-d',strtotime(implode("-",$regArr))));
-    //     //     $due_date_diff = date_diff($today,$date_renew);
-    //     //     $days = (int)$due_date_diff->format('%a')%365;
-    //     //     // $List[$index]->days = $days;
-    //     //     $List[$index]->cls = ($days<=$d_danger) ? "bg_danger" : (($days>$d_danger&&$days<=$d_warning) ? "bg_warning" : "") ;
-    //     //     $List[$index]->disabled = ($days<=$d_danger) ? "" : "disabled" ;
-
-    //     // }
-
-    //     foreach ($List as $index => $item) {
-    //         $date = (date('Y-m-d',strtotime($item->InsHistoryDate))); // Replace with your date
-    //         $newDate = date('d/m/Y', strtotime('+365 days', strtotime($date)));
-    //         // $newDate = date("d/m/Y", strtotime($date));
-    //         //echo $newDate; // Outputs: 2026-01-21\
-    //         $List[$index]->next_Ins = $newDate;
-
-    //     }
-
-    //     return view('InsView',["list"=>$List]);
-
-    // }
+    
 
     function sum()
     {
