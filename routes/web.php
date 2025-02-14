@@ -40,15 +40,16 @@ Route::get('/infomation/{id}',[AdminController::class,'showIn'])->name('infomati
 Route::get('CheckRenew/{id}',[AdminController::class,'renewCheck'])->name('CheckRenew');
 Route::get('editInfo/{id}',[AdminController::class,'editInfo'])->name('editInfo');
 Route::post('updateInfo/{id}',[AdminController::class,'updateInfo'])->name('updateInfo');
-Route::get('CheckCosts/{id}',[CalculateController::class,'CalCosts'])->name('CheckCosts');
+// Route::get('/check-costs/{id}/{typeRenew?}', [CalculateController::class, 'CalCosts'])->name('CheckCosts');
+Route::get('CheckCosts/{id}/{typeRenew?}',[CalculateController::class,'CalCosts'])->name('CheckCosts');
+Route::post('CheckCosts/{id}/{typeRenew?}', [CalculateController::class, 'CalCosts']);
 //Route::get('history/{id}',[AdminController::class,'CalCosts'])->name('CheckCosts');
 Route::get('InsView',[AdminController::class,'InsView']);
 Route::get('/history/{id}',[AdminController::class,'showHis'])->name('history');
 Route::get('/sum', [ChartController::class, 'CarChart']);
 
 
-
-Route::post('/save-renew-history/{id}', [AdminController::class, 'saveRenewHistory'])->name('saveRenewHistory');
+Route::post('/store-history', [AdminController::class, 'storeHistory'])->name('storeHistory');
 
 
 

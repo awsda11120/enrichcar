@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('TypeRenew');
             $table->string('Receive');
             $table->string('ProofOfReceive')->nullable();
+            $table->integer('SumCost');
             $table->timestamps();
         });
     }

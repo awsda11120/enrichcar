@@ -13,6 +13,7 @@ class History extends Model
         'DateRenew',
         'TypeRenew',
         'Receive',
-        'ProofOfReceive'
+        'ProofOfReceive',
+        'SumCost'
     ];
 }
