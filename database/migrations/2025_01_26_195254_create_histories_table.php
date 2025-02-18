@@ -19,7 +19,8 @@ return new class extends Migration
             $table->string('Receive');
             $table->string('ProofOfReceive')->nullable();
             $table->integer('SumCost');
-            $table->timestamps();
+            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
         });
     }
 

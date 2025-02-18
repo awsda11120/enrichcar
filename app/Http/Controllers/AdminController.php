@@ -10,21 +10,22 @@ use Carbon\Carbon;
 
 class AdminController extends Controller
 {
+    // public function storeHistory(Request $request){
+
+
+    // }
+
+
 
     public function storeHistory(Request $request)
-{
-    // $history = new History();
-    // $history->car_id = $request->car_id;
-    // $history->type_renew = $request->type_renew;
-    // $history->receive_option = $request->receive_option;
-    // $history->total_cost = $request->total_cost;
-    // $history->save();
+    {
+    
     $type_renew = [];
     if ($request->input('calculateRenew') == 1) {
-        $type_renew[] = 'calculateRenew';
+        $type_renew[] = 'พ.ร.บ.';
     }
     if ($request->input('calculateTax') == 1) {
-        $type_renew[] = 'calculateTax';
+        $type_renew[] = 'ภาษี';
     }
 
     // ถ้าไม่มีการเลือกประเภทการต่ออายุ ให้กำหนดเป็น 'none'
@@ -34,8 +35,6 @@ class AdminController extends Controller
 
     $receive_option = $request->input('receive_option', ''); 
 
-
-    
     $dataData=[
         'CarId' => $request->car_id, // บันทึก Car ID ที่ส่งมาจากฟอร์ม
         'DateRenew' => null, // บันทึกวันที่ทำรายการ
@@ -44,12 +43,18 @@ class AdminController extends Controller
         'ProofOfReceive' => null, // ยังไม่มีหลักฐานการรับ
         'SumCost' => $request->total_cost,
     ];
-    \Log::info('TypeRenew: ' . implode(', ', $type_renew));  // ดูค่าที่จะถูกบันทึก
-dd($dataData);  // ตรวจสอบว่าข้อมูลที่ส่งไปถูกต้องไหม
-
     DB::table('histories')->insert($dataData);
 
-    return redirect()->route('history', ['id' => $request->car_id])->with('success', 'บันทึกข้อมูลเรียบร้อยแล้ว');
+    $List =  DB::table('histories as htr')
+                 ->join('cars as c','htr.CarId','=','c.id')
+                 ->select('c.CarNumber','htr.Receive','htr.TypeRenew','c.id','c.BookOwner')
+                 ->get();
+    // $cID = $List->id;
+
+    return view('history',['list' => $List]);
+
+    // return redirect()->route('history')->with(['list' => $List, 'success' => 'บันทึกข้อมูลเรียบร้อยแล้ว']);
+
 }
 
     
