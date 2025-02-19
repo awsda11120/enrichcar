@@ -4,7 +4,7 @@
     <div class="container">
         <div class="input-group mb-3 d-flex align-items-center">
             <!-- ตัวเลือกการแสดงข้อมูล -->
-            <div class="col-md-2">
+            <div class="col-md-2 me-3">
                 <select id="CarFilter" class="form-select">
                     <option value="all" selected>แสดงข้อมูล...</option>
                     <option value="all">แสดงข้อมูลทั้งหมด</option>
@@ -17,9 +17,9 @@
             <form class="d-flex col-md-2 " role="search">
                 <input id="searchInput" class="form-control me-2" type="search" aria-label="Search"
                     placeholder="ค้นหาเลขทะเบียน...">
-                <button class="btn" style="background-color: #F7CBC7" type="submit">
+                {{-- <button class="btn" style="background-color: #F7CBC7" type="submit">
                     <i class="bi bi-search"></i>
-                </button>
+                </button> --}}
             </form>
 
             <!-- ปุ่มเพิ่มข้อมูล -->

@@ -254,7 +254,7 @@
                     ข้อมูล</a>
                 <a href="/history" class="{{ request()->is('history') ? 'active' : '' }}"><i
                         class="bi bi-clock-history"></i> ประวัติทำรายการ</a>
-                <a href="/tracknum" class="{{ request()->is('tracknum') ? 'active' : '' }}"><i
+                <a href="/receive" class="{{ request()->is('receive') ? 'active' : '' }}"><i
                         class="bi bi-box-seam"></i> การรับเอกสาร</a>
                 <a href="/sum" class="{{ request()->is('sum') ? 'active' : '' }}"><i
                         class="bi bi-bar-chart-line-fill"></i> สรุปขข้อมูล</a>

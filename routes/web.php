@@ -10,6 +10,9 @@ use App\Http\Controllers\ChartController;
 Route::get('/', function () {
     return view('welcome');
 });
+Route::get('/receive', function () {
+    return view('receive');
+});
 
 
 Route::get('/customer', [AdminController::class,'customer'])->name('customer');
