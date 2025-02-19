@@ -10,50 +10,51 @@ use Carbon\Carbon;
 
 class AdminController extends Controller
 {
+    // public function storeHistory(Request $request){
 
-    public function saveRenewHistory(Request $request ,$id)
-{
-    $data = DB::table('cars as c')
-        ->join('customers as cs', 'c.CusId','=', 'cs.id')
-        ->join('settings_renew as sr', 'sr.cartype_id','=', 'c.TypeID')
-        ->select('c.id','c.BookOwner', 'cs.CustomerName','cs.NationalID','cs.PhoneNumber',
-        'cs.Address','c.SelectOption','c.TaxHistoryDate','c.InsHistoryDate','c.TaxId',
-        'c.CarCC','c.CarWeight','c.InsuranceType','c.TypeId','sr.renew_cost','sr.fee','sr.delivery_cost')
-        ->where('c.id', $id)
-        ->first();
-        
-        $rc = $data->SelectOption;
 
-    // ตรวจสอบว่ามีการติ๊กตัวเลือกไหนบ้าง
-    $renew_prb = $request->has('renew_prb') ? 'พ.ร.บ.' : null;
-    $renew_tax = $request->has('renew_tax') ? 'ภาษี' : null;
+    // }
 
-    // ตรวจสอบว่ามีการเลือกต่ออายุอะไรบ้าง
-    $typeRenew = [];
-    if ($renew_prb) $typeRenew[] = $renew_prb;
-    if ($renew_tax) $typeRenew[] = $renew_tax;
 
-    // ถ้าไม่มีการเลือกต่ออายุ ไม่ต้องบันทึกข้อมูล
-    if (empty($typeRenew)) {
-        return redirect()->back()->with('error', 'กรุณาเลือกประเภทการต่ออายุ');
+
+    public function storeHistory(Request $request)
+    {
+    
+    $type_renew = [];
+    if ($request->input('calculateRenew') == 1) {
+        $type_renew[] = 'พ.ร.บ.';
+    }
+    if ($request->input('calculateTax') == 1) {
+        $type_renew[] = 'ภาษี';
     }
 
-    // $dataData = DB::table('histories');
+    // ถ้าไม่มีการเลือกประเภทการต่ออายุ ให้กำหนดเป็น 'none'
+    if (empty($type_renew)) {
+        $type_renew[] = 'none';
+    }
 
-    
+    $receive_option = $request->input('receive_option', ''); 
 
-    // บันทึกลงฐานข้อมูล
     $dataData=[
-        'CarId' => $request->id, // บันทึก Car ID ที่ส่งมาจากฟอร์ม
+        'CarId' => $request->car_id, // บันทึก Car ID ที่ส่งมาจากฟอร์ม
         'DateRenew' => null, // บันทึกวันที่ทำรายการ
-        'TypeRenew' => implode(', ', $typeRenew), // บันทึกประเภทการต่ออายุ (พรบ. หรือ ภาษี)
-        'Receive' => $rc, // บันทึกการรับเอกสาร
+        'TypeRenew' => implode(', ', $type_renew), // บันทึกประเภทการต่ออายุ (พรบ. หรือ ภาษี)
+        'Receive' => $receive_option, // บันทึกการรับเอกสาร
         'ProofOfReceive' => null, // ยังไม่มีหลักฐานการรับ
+        'SumCost' => $request->total_cost,
     ];
-
     DB::table('histories')->insert($dataData);
 
-    return redirect()->route('CheckCosts', ['id' => $data->id]);
+    $List =  DB::table('histories as htr')
+                 ->join('cars as c','htr.CarId','=','c.id')
+                 ->select('c.CarNumber','htr.Receive','htr.TypeRenew','c.id','c.BookOwner')
+                 ->get();
+    // $cID = $List->id;
+
+    return view('history',['list' => $List]);
+
+    // return redirect()->route('history')->with(['list' => $List, 'success' => 'บันทึกข้อมูลเรียบร้อยแล้ว']);
+
 }
 
     

@@ -35,20 +35,20 @@
             </tr>
         </thead>
         <tbody class="text-center">
-            {{-- @foreach ($list as $item) --}}
+            @foreach ($list as $item)
                 <tr>
                     <td><input type="text" class="form-control datepicker col-md-2" name="RegistrationDate" readonly></td>
-                    <td>2พน 1414</td>
-                    <td>พรบ.</td>
-                    <td>จัดส่งที่บ้าน</td>
-                    <td>2พน_1414.png</td>
+                    <td>{{ $item->CarNumber }}</td>
+                    <td>{{ $item->TypeRenew }}</td>
+                    <td>{{ $item->Receive }}</td>
+                    <td>{{ $item->CarNumber }}</td>
                     <td style="background:#FFF!important;">
                         <a href="#" class="btn btn-light btn-sm"
                             style="background-color:#A4F02A">เสร็จสิ้น</a>
                     </td>
 
                 </tr>
-            {{-- @endforeach --}}
+            @endforeach
         </tbody>
     </table>
     @endsection
