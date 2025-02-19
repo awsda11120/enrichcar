@@ -34,8 +34,8 @@
                 <td class="text-danger">จัดส่งที่บ้าน</td>
                 <td>TH1248564136</td>
                 <td>
-                    <button class="btn btn-success">บันทึก</button>
-                    <button class="btn btn-secondary">แก้ไข</button>
+                    <a href="#" class="btn mx-2" style="background-color:#A4F02A">บันทึก</a>
+                    <a href="#" class="btn mx-2" style="background-color:#F0DF2A">แก้ไข</a>
                 </td>
             </tr>
             <tr>
@@ -46,8 +46,8 @@
                 <td class="text-danger">จัดส่งที่บ้าน</td>
                 <td><input type="text" class="form-control" placeholder="กรุณากรอกเลขพัสดุ"></td>
                 <td>
-                    <button class="btn btn-success">บันทึก</button>
-                    <button class="btn btn-secondary">แก้ไข</button>
+                    <a href="#" class="btn mx-2" style="background-color:#A4F02A">บันทึก</a>
+                    <a href="#" class="btn mx-2" style="background-color:#F0DF2A">แก้ไข</a>
                 </td>
             </tr>
             <tr>
