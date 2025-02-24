@@ -59,14 +59,15 @@ class AdminController extends Controller
 
     
 
-    function showHis($id)
+    function showHis()
     {
-        $car = DB::table('cars')->where('id', $id)->first();
-        // $his = DB::table('histories as his')
-        // // ->join('cars as c','his.id','=','c.id')
-        // ->select('cars.CarNumber','cars.BookOwner','cars.SelectOption')
-        // ->get();
-        return view('history',compact('car'));
+        $List =  DB::table('histories as htr')
+                 ->join('cars as c','htr.CarId','=','c.id')
+                 ->select('c.CarNumber','htr.Receive','htr.TypeRenew','c.id','c.BookOwner')
+                 ->get();
+    // $cID = $List->id;
+
+        return view('history',['list' => $List]);
     }
 
 

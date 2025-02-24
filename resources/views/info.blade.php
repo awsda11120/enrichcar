@@ -27,7 +27,7 @@
 
             <!-- ตัวบ่งชี้สี -->
             <div class="d-flex align-items-center ms-auto">
-                <span class="color-box" style="background-color: #FFCCCC;"></span>
+                <span class="color-box" style="background-color: #ff7d7d;"></span>
                 <span class="me-3"> พ.ร.บ./ภาษีจะหมดอายุใน 30 วัน</span>
 
                 <span class="color-box" style="background-color: #FFFF99;"></span>
@@ -92,8 +92,6 @@
                     }
                 @endphp
 
-
-
                 <tr>
                     <td>{{ $item->CarNumber }}</td>
                     <td>{{ $item->CustomerName }}</td>
@@ -142,5 +140,4 @@
             });
         });
     </script>
-
 @endsection

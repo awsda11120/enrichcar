@@ -252,7 +252,7 @@
             <div class="sidebar">
                 <a href="/info" class="{{ request()->is('info') ? 'active' : '' }}"><i class="bi bi-car-front"></i>
                     ข้อมูล</a>
-                <a href="/history" class="{{ request()->is('history') ? 'active' : '' }}"><i
+                <a href="/ShowHis" class="{{ request()->is('showHis') ? 'active' : '' }}"><i
                         class="bi bi-clock-history"></i> ประวัติทำรายการ</a>
                 <a href="/receive" class="{{ request()->is('receive') ? 'active' : '' }}"><i
                         class="bi bi-box-seam"></i> การรับเอกสาร</a>

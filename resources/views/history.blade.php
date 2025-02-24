@@ -28,7 +28,8 @@
             <tr>
                 <th scope="col">วันที่ดำเนินการต่อ</th>
                 <th scope="col">ทะเบียนรถ</th>
-                <th scope="col">ประเภทการต่อ</th>
+                <th scope="col">พ.ร.บ.</th>
+                <th scope="col">ภาษี</th>
                 <th scope="col">การรับเอกสาร</th>
                 <th scope="col">ดาวน์โหลด</th>
                 <th scope="col">สถานะ</th>
@@ -40,6 +41,7 @@
                     <td><input type="text" class="form-control datepicker col-md-2" name="RegistrationDate" readonly></td>
                     <td>{{ $item->CarNumber }}</td>
                     <td>{{ $item->TypeRenew }}</td>
+                    <td>ต่อ</td>
                     <td>{{ $item->Receive }}</td>
                     <td>{{ $item->CarNumber }}</td>
                     <td style="background:#FFF!important;">

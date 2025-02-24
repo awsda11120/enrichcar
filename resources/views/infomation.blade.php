@@ -91,24 +91,23 @@
 
                         </div>
                     </div>
-
                 </div>
-                <form action="{{ route('CheckCosts',['id' => $list->id]) }}" method="POST">
+                <form action="{{ route('CheckCosts', ['id' => $list->id]) }}" method="POST">
                     @csrf
                     <input type="hidden" name="id" value="{{ $list->id }}">
                     <div class="container">
                         <div class="row">
                             <div class="form-check form-check col-md-3 offset-md-10">
                                 <input type="checkbox" name="renew_prb" value="1"
-                                    @if ($days_ins > 90) disabled @endif > ต่อ พ.ร.บ.
+                                    @if ($days_ins > 90) disabled @endif> ต่อ พ.ร.บ.
                             </div>
                             <div class="form-check form-check col-md-3 offset-md-10">
                                 <input type="checkbox" name="renew_tax" value="1"
-                                    @if ($days > 90) disabled @endif > ต่อภาษี
+                                    @if ($days > 90) disabled @endif> ต่อภาษี
                             </div>
                         </div>
                     </div>
-                
+
                     <div class="d-flex justify-content-between align-items-center">
                         <a href="/info" class="btn my-3" style="background-color:#9fdffa"> กลับ</a>
                         <a href="/info" class="btn my-3" style="background-color:#F0DF2A">แก้ไข</a>
