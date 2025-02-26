@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('CarId');
             $table->date('DateRenew')->nullable();
-            $table->string('TypeRenew');
+            $table->integer('TypeRenewIns')->nullable();
+            $table->integer('TypeRenewTax')->nullable();
             $table->string('Receive');
             $table->string('ProofOfReceive')->nullable();
             $table->integer('SumCost');

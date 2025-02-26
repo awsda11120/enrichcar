@@ -99,14 +99,33 @@
                         <div class="row">
                             <div class="form-check form-check col-md-3 offset-md-10">
                                 <input type="checkbox" name="renew_prb" value="1"
-                                    @if ($days_ins > 90) disabled @endif> ต่อ พ.ร.บ.
+                                    @if ($days_ins > 90) disabled @endif > ต่อ พ.ร.บ.
                             </div>
                             <div class="form-check form-check col-md-3 offset-md-10">
                                 <input type="checkbox" name="renew_tax" value="1"
-                                    @if ($days > 90) disabled @endif> ต่อภาษี
+                                    @if ($days > 90) disabled @endif > ต่อภาษี
                             </div>
                         </div>
                     </div>
+
+                    {{-- <!-- แก้ไขไฟล์ infomation.blade.php -->
+                    <form method="POST" action="{{ route('admin.saveInfo') }}">
+                        @csrf
+
+                        <label>
+                            <input type="checkbox" name="TypeRenewIns" value="1"
+                                {{ old('TypeRenewIns') ? 'checked' : '' }}> ต่อ พรบ.
+                        </label>
+                        <br>
+                        <label>
+                            <input type="checkbox" name="TypeRenewTax" value="1"
+                                {{ old('TypeRenewTax') ? 'checked' : '' }}> ต่อ ภาษี
+                        </label>
+                        <br>
+
+                        <button type="submit">บันทึก</button>
+                    </form> --}}
+
 
                     <div class="d-flex justify-content-between align-items-center">
                         <a href="/info" class="btn my-3" style="background-color:#9fdffa"> กลับ</a>

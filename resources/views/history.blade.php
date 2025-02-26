@@ -1,5 +1,5 @@
 @extends('layout')
-@section('doc', 'Add')
+@section('doc', 'History')
 @section('content')
 
     <div class="row">
@@ -38,19 +38,31 @@
         <tbody class="text-center">
             @foreach ($list as $item)
                 <tr>
-                    <td><input type="text" class="form-control datepicker col-md-2" name="RegistrationDate" readonly></td>
+                    <td><input type="text" class="form-control datepicker col-md-2" name="RegistrationDate" readonly>
+                    </td>
                     <td>{{ $item->CarNumber }}</td>
-                    <td>{{ $item->TypeRenew }}</td>
-                    <td>ต่อ</td>
+                    <td>
+                        @if ($item->TypeRenewIns == 1)
+                            <span class="text-green-500">✔</span>
+                        @else
+                            <span class="text-red-500">✘</span>
+                        @endif
+                    </td>
+                    <td>
+                        @if ($item->TypeRenewTax == 1)
+                            <span class="text-green-500">✔</span>
+                        @else
+                            <span class="text-red-500">✘</span>
+                        @endif
+                    </td>
                     <td>{{ $item->Receive }}</td>
                     <td>{{ $item->CarNumber }}</td>
                     <td style="background:#FFF!important;">
-                        <a href="#" class="btn btn-light btn-sm"
-                            style="background-color:#A4F02A">เสร็จสิ้น</a>
+                        <a href="#" class="btn btn-light btn-sm" style="background-color:#A4F02A">เสร็จสิ้น</a>
                     </td>
 
                 </tr>
             @endforeach
         </tbody>
     </table>
-    @endsection
+@endsection

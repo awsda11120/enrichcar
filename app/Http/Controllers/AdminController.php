@@ -14,31 +14,47 @@ class AdminController extends Controller
 
 
     // }
+    
 
 
 
     public function storeHistory(Request $request)
     {
     
-    $type_renew = [];
+    $type_ins = null;
+    $type_tax = null;
     if ($request->input('calculateRenew') == 1) {
-        $type_renew[] = 'พ.ร.บ.';
+        $type_ins = 1;
     }
+    else if ($request->input('calculateRenew') == 0) {
+        $type_ins = 0;
+    }
+
     if ($request->input('calculateTax') == 1) {
-        $type_renew[] = 'ภาษี';
+        $type_tax = 1;
+    }
+    else if ($request->input('calculateTax') == 0) {
+        $type_tax = 0;
     }
 
     // ถ้าไม่มีการเลือกประเภทการต่ออายุ ให้กำหนดเป็น 'none'
-    if (empty($type_renew)) {
-        $type_renew[] = 'none';
-    }
+    // if (empty($type_renew)) {
+    //     $type_renew[] = 'none';
+    // }
+    // $request->validate([
+    //     'TypeRenewIns' => 'nullable|boolean',
+    //     'TypeRenewTax' => 'nullable|boolean',
+    // ]);
+    
 
     $receive_option = $request->input('receive_option', ''); 
 
     $dataData=[
         'CarId' => $request->car_id, // บันทึก Car ID ที่ส่งมาจากฟอร์ม
         'DateRenew' => null, // บันทึกวันที่ทำรายการ
-        'TypeRenew' => implode(', ', $type_renew), // บันทึกประเภทการต่ออายุ (พรบ. หรือ ภาษี)
+        // 'TypeRenew' => implode(', ', $type_renew), // บันทึกประเภทการต่ออายุ (พรบ. หรือ ภาษี)
+        'TypeRenewIns' => $type_ins,
+        'TypeRenewTax' => $type_tax,
         'Receive' => $receive_option, // บันทึกการรับเอกสาร
         'ProofOfReceive' => null, // ยังไม่มีหลักฐานการรับ
         'SumCost' => $request->total_cost,
@@ -47,7 +63,7 @@ class AdminController extends Controller
 
     $List =  DB::table('histories as htr')
                  ->join('cars as c','htr.CarId','=','c.id')
-                 ->select('c.CarNumber','htr.Receive','htr.TypeRenew','c.id','c.BookOwner')
+                 ->select('c.CarNumber','htr.Receive','htr.TypeRenewIns','htr.TypeRenewTax','c.id','c.BookOwner')
                  ->get();
     // $cID = $List->id;
 
@@ -63,7 +79,7 @@ class AdminController extends Controller
     {
         $List =  DB::table('histories as htr')
                  ->join('cars as c','htr.CarId','=','c.id')
-                 ->select('c.CarNumber','htr.Receive','htr.TypeRenew','c.id','c.BookOwner')
+                 ->select('c.CarNumber','htr.Receive','htr.TypeRenewIns','htr.TypeRenewTax','c.id','c.BookOwner')
                  ->get();
     // $cID = $List->id;
 

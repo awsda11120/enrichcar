@@ -56,3 +56,4 @@ Route::post('/store-history', [AdminController::class, 'storeHistory'])->name('s
 
 
 
+

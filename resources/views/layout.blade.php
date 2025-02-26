@@ -18,6 +18,8 @@
     <script src="//code.jquery.com/jquery-1.10.2.js"></script>
     <script src="//code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
     {{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> --}}
+    
+
 
 
     <style>
@@ -254,8 +256,8 @@
                     ข้อมูล</a>
                 <a href="/ShowHis" class="{{ request()->is('showHis') ? 'active' : '' }}"><i
                         class="bi bi-clock-history"></i> ประวัติทำรายการ</a>
-                <a href="/receive" class="{{ request()->is('receive') ? 'active' : '' }}"><i
-                        class="bi bi-box-seam"></i> การรับเอกสาร</a>
+                <a href="/receive" class="{{ request()->is('receive') ? 'active' : '' }}"><i class="bi bi-box-seam"></i>
+                    การรับเอกสาร</a>
                 <a href="/sum" class="{{ request()->is('sum') ? 'active' : '' }}"><i
                         class="bi bi-bar-chart-line-fill"></i> สรุปขข้อมูล</a>
                 <a href="/settings/general" class="{{ request()->is('settings/general') ? 'active' : '' }}"><i
