@@ -53,7 +53,7 @@ Route::get('/sum', [ChartController::class, 'CarChart']);
 
 
 Route::post('/store-history', [AdminController::class, 'storeHistory'])->name('storeHistory');
-
+Route::post('/update-date-renew', [AdminController::class, 'updateDateRenew'])->name('updateDateRenew');
 
 
 
