@@ -129,7 +129,7 @@
             background-color: white;
         } */
 
-        .ins-red {
+        /* .ins-red {
             background-color: #FFCCCC !important;
         }
 
@@ -146,23 +146,29 @@
 
         .tax-yellow {
             background-color: #FFFF99 !important;
-        }
+        } */
 
 
 
         /* end add info form */
-        /* .errMsg ul li{
+        .errMsg ul li{
             list-style: none;
             color:#EC0000;
         }
         .bg_danger td {
-            background:#da5060!important;
+            background:#f87979!important;
             color:##000;
         }
+
         .bg_warning td {
-            background:#ffe658!important;
+            background:#FFFF99!important;
             color:#000;
         }
+        .bg_expire td{
+            background:#D3D3D3!important;
+            color:#000;
+        }
+        /*
         .exp {
             background-color: gray !important;
         }
@@ -239,7 +245,7 @@
 <body style="background-color: #FDF5F4;">
     <nav class="navbar navbar-expand-lg" style="background-color: #F7CBC7;">
         <div class="container-fluid">
-            <a class="navbar-brand" href="/info">EINS system</a>
+            <a class="navbar-brand" href="/">EINS system</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -252,7 +258,7 @@
             <div class="sidebar">
                 <a href="/info" class="{{ request()->is('info') ? 'active' : '' }}"><i class="bi bi-car-front"></i>
                     ข้อมูล</a>
-                <a href="/history" class="{{ request()->is('history') ? 'active' : '' }}"><i
+                <a href="/store-history" class="{{ request()->is('history') ? 'active' : '' }}"><i
                         class="bi bi-clock-history"></i> ประวัติทำรายการ</a>
                 <a href="/receive" class="{{ request()->is('receive') ? 'active' : '' }}"><i
                         class="bi bi-box-seam"></i> การรับเอกสาร</a>

@@ -19,7 +19,7 @@ class AdminController extends Controller
 
     public function storeHistory(Request $request)
     {
-    
+
     $type_renew = [];
     if ($request->input('calculateRenew') == 1) {
         $type_renew[] = 'พ.ร.บ.';
@@ -33,7 +33,7 @@ class AdminController extends Controller
         $type_renew[] = 'none';
     }
 
-    $receive_option = $request->input('receive_option', ''); 
+    $receive_option = $request->input('receive_option', '');
 
     $dataData=[
         'CarId' => $request->car_id, // บันทึก Car ID ที่ส่งมาจากฟอร์ม
@@ -57,17 +57,17 @@ class AdminController extends Controller
 
 }
 
-    
 
-    function showHis($id)
-    {
-        $car = DB::table('cars')->where('id', $id)->first();
-        // $his = DB::table('histories as his')
-        // // ->join('cars as c','his.id','=','c.id')
-        // ->select('cars.CarNumber','cars.BookOwner','cars.SelectOption')
-        // ->get();
-        return view('history',compact('car'));
-    }
+
+    // function showHis($id)
+    // {
+    //     $car = DB::table('cars')->where('id', $id)->first();
+    //     // $his = DB::table('histories as his')
+    //     // // ->join('cars as c','his.id','=','c.id')
+    //     // ->select('cars.CarNumber','cars.BookOwner','cars.SelectOption')
+    //     // ->get();
+    //     return view('history',compact('car'));
+    // }
 
 
 
@@ -136,7 +136,7 @@ class AdminController extends Controller
 
 
 
-    
+
     function info(){
         $List =  DB::table('cars as c')
                  ->join('customers as cs','c.CusId','=','cs.id')
@@ -147,8 +147,8 @@ class AdminController extends Controller
         foreach ($List as $index => $item) {
             $d_warning = 90;
             $d_danger = 30;
-            $ins_warning = 90;
-            $ins_danger = 30;
+            // $ins_warning = 90;
+            // $ins_danger = 30;
 
 
             $register_day = date_create(date('Y-m-d',strtotime($item->RegistrationDate)));
@@ -168,16 +168,16 @@ class AdminController extends Controller
             $date_renew =  date_create(date('Y-m-d',strtotime(implode("-",$regArr))));
             $due_date_diff = date_diff($today,$date_renew);
             $days = (int)$due_date_diff->format('%a')%365;
-            // $List[$index]->days = $days;
-            // $List[$index]->cls = ($days<=$d_danger) ? "bg_danger" : (($days>$d_danger&&$days<=$d_warning) ? "bg_warning" : "") ;
-            // $List[$index]->disabled = ($days<=$d_danger) ? "" : "disabled" ;
+            $List[$index]->days = $days;
+            $List[$index]->cls = ($days<=$d_danger) ? "bg_danger" : (($days>$d_danger&&$days<=$d_warning) ? "bg_warning" : "") ;
+            $List[$index]->disabled = ($days<=$d_danger) ? "bg_expire" : "disabled" ;
             $date = (date('Y-m-d',strtotime($item->InsHistoryDate))); // Replace with your date
             $newDate = date('d/m/Y', strtotime('+365 days', strtotime($date)));
             $List[$index]->next_Ins = $newDate;
             $ins = date('Y-m-d',strtotime('+365 days', strtotime($date)));
             $ins = date_create($ins);
             $diff_ins = date_diff($today,$ins);
-            $days_ins = (int)$diff_ins->format('%a')%365;
+            // $days_ins = (int)$diff_ins->format('%a')%365;
             // $List[$index]->cls2 = ($days_ins<=$d_danger) ? "bg_danger" : (($days_ins>$d_danger&&$days<=$d_warning) ? "bg_warning" : "") ;
             // $List[$index]->disabled = ($days_ins<=$d_danger) ? "" : "disabled" ;
             // echo"<br>".$diff;
@@ -235,7 +235,7 @@ class AdminController extends Controller
         return view('info',["list"=>$List]);
 
     }
-    
+
 
     function sum()
     {
@@ -542,7 +542,7 @@ class AdminController extends Controller
         // DB::table('cus_and_cars')->insert($dataCusAndCar);
         DB::table('customers')->where('id',$id)->update($dataCustomer);
         DB::table('cars')->where('id',$id)->update($dataCar);
-        return redirect('infomation');
+        return redirect('info');
 
     }
 }

@@ -27,7 +27,7 @@
 
             <!-- ตัวบ่งชี้สี -->
             <div class="d-flex align-items-center ms-auto">
-                <span class="color-box" style="background-color: #FFCCCC;"></span>
+                <span class="color-box" style="background-color: #f87979;"></span>
                 <span class="me-3"> พ.ร.บ./ภาษีจะหมดอายุใน 30 วัน</span>
 
                 <span class="color-box" style="background-color: #FFFF99;"></span>
@@ -64,7 +64,7 @@
         </thead>
         <tbody class="text-center">
             @foreach ($list as $item)
-                @php
+                {{-- @php
                     // คำนวณจำนวนวันคงเหลือ
                     $insDaysLeft = (strtotime($item->next_Ins) - time()) / (60 * 60 * 24);
                     $taxDaysLeft = (strtotime($item->renew) - time()) / (60 * 60 * 24);
@@ -90,24 +90,21 @@
                     } elseif ($taxDaysLeft <= 90) {
                         $taxColor = 'background-color: #FFFF99 !important;'; // สีเหลือง
                     }
-                @endphp
+                @endphp --}}
 
 
 
-                <tr>
-                    <td>{{ $item->CarNumber }}</td>
-                    <td>{{ $item->CustomerName }}</td>
-                    <td>{{ $item->PhoneNumber }}</td>
-                    <td style="{{ $insColor ?? '' }}" data-ins-exp="{{ $insDaysLeft < 90 ? 'yes' : 'no' }}">
-                        {{ $item->next_Ins }}
-                    </td>
-                    <td style="{{ $taxColor ?? '' }}" data-tax-exp="{{ $taxDaysLeft < 90 ? 'yes' : 'no' }}">
-                        {{ $item->renew }}
-                    </td>
-                    <td>
+                <tr class="{{ $item->cls }}">
+                    <td style="background:#FFF!important;">{{ $item->CarNumber }}</td>
+                    <td style="background:#FFF!important;">{{ $item->CustomerName }}</td>
+                    <td style="background:#FFF!important;">{{ $item->PhoneNumber }}</td>
+                    <td>{{ $item->next_Ins }} </td>
+                    <td>{{ $item->renew }}</td>
+                    <td style="background:#FFF!important;">
                         <a href="{{ route('infomation', $item->id) }}" class="btn btn-light btn-sm"
                             style="background-color:#A4F02A">ดำเนินการต่อ</a>
                     </td>
+                    {{-- style="{{ $insColor ?? '' }}" data-ins-exp="{{ $insDaysLeft < 90 ? 'yes' : 'no' }}" --}}
                 </tr>
             @endforeach
         </tbody>
@@ -116,31 +113,26 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function() {
-            // ฟังก์ชันกรองข้อมูล
-            $('#CarFilter').change(function() {
-                let filter = $(this).val();
-                $('tbody tr').show();
+            // ฟังก์ชันแปลงวันที่ให้อยู่ในรูปแบบ Date object
+            function parseDate(dateString) {
+                return new Date(dateString);
+            }
 
-                if (filter === 'ins_expiring') {
-                    $('tbody tr').filter(function() {
-                        return $(this).attr('data-ins-exp') !== 'yes';
-                    }).hide();
-                } else if (filter === 'tax_expiring') {
-                    $('tbody tr').filter(function() {
-                        return $(this).attr('data-tax-exp') !== 'yes';
-                    }).hide();
-                }
+            // กรองข้อมูลเมื่อมีการเปลี่ยนค่าของฟิลเตอร์
+            $("#CarFilter").change(function() {
+                filterTable();
             });
 
-            // ฟังก์ชันค้นหาจากเลขทะเบียน
-            $('#searchInput').on('keyup', function() {
+            // ค้นหาข้อมูลตามเลขทะเบียน
+            $("#searchInput").on("keyup", function() {
                 let value = $(this).val().toLowerCase();
-                $('tbody tr').filter(function() {
-                    $(this).toggle($(this).find('td:first').text().toLowerCase().indexOf(value) > -
+                $("tbody tr").filter(function() {
+                    $(this).toggle($(this).find("td:first").text().toLowerCase().indexOf(value) > -
                         1);
                 });
             });
         });
     </script>
+
 
 @endsection
