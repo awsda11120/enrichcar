@@ -187,6 +187,7 @@ class AdminController extends Controller
         foreach ($List as $index => $item) {
             $d_warning = 90;
             $d_danger = 30;
+            $d_expire = 0;
             // $ins_warning = 90;
             // $ins_danger = 30;
 
@@ -209,8 +210,21 @@ class AdminController extends Controller
             $due_date_diff = date_diff($today,$date_renew);
             $days = (int)$due_date_diff->format('%a')%365;
             $List[$index]->days = $days;
-            $List[$index]->cls = ($days<=$d_danger) ? "bg_danger" : (($days>$d_danger&&$days<=$d_warning) ? "bg_warning" : "") ;
-            $List[$index]->disabled = ($days<=$d_danger) ? "bg_expire" : "disabled" ;
+            if (!isset($List[$index])) {
+                $List[$index] = new stdClass();
+            }
+
+            if ($days <= $d_expire) {
+                $List[$index]->cls = "bg_expire";
+            } elseif ($days <= $d_danger) {
+                $List[$index]->cls = "bg_danger";
+            } elseif ($days <= $d_warning) {
+                $List[$index]->cls = "bg_warning";
+            } else {
+                $List[$index]->cls = ""; // ค่าเริ่มต้นหากไม่เข้าเงื่อนไขใดเลย
+            }
+            // $List[$index]->cls = ($days<=$d_expire) ? "bg_expire" : ($days<=$d_danger) ? "bg_danger" : (($days>$d_danger&&$days<=$d_warning) ? "bg_warning" :"");
+            $List[$index]->disabled = ($days<=$d_danger) ? "" : "disabled" ;
             $date = (date('Y-m-d',strtotime($item->InsHistoryDate))); // Replace with your date
             $newDate = date('d/m/Y', strtotime('+365 days', strtotime($date)));
             $List[$index]->next_Ins = $newDate;
