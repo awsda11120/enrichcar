@@ -11,7 +11,8 @@ class History extends Model
     protected $fillable = [
         'CarId',
         'DateRenew',
-        'TypeRenew',
+        'TypeRenewIns',
+        'TypeRenewTax',
         'Receive',
         'ProofOfReceive',
         'SumCost'

@@ -46,13 +46,14 @@ Route::post('updateInfo/{id}',[AdminController::class,'updateInfo'])->name('upda
 // Route::get('/check-costs/{id}/{typeRenew?}', [CalculateController::class, 'CalCosts'])->name('CheckCosts');
 Route::get('CheckCosts/{id}/{typeRenew?}',[CalculateController::class,'CalCosts'])->name('CheckCosts');
 Route::post('CheckCosts/{id}/{typeRenew?}', [CalculateController::class, 'CalCosts']);
-//Route::get('history/{id}',[AdminController::class,'CalCosts'])->name('CheckCosts');
 Route::get('InsView',[AdminController::class,'InsView']);
 Route::get('/history/{id}',[AdminController::class,'storeHistory'])->name('history');
+Route::get('/ShowHis',[AdminController::class,'showHis']);
 Route::get('/sum', [ChartController::class, 'CarChart']);
 
 
 Route::post('/store-history', [AdminController::class, 'storeHistory'])->name('storeHistory');
+Route::post('/update-date-renew', [AdminController::class, 'updateDateRenew'])->name('updateDateRenew');
 
 
 

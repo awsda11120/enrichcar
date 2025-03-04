@@ -91,9 +91,8 @@
 
                         </div>
                     </div>
-
                 </div>
-                <form action="{{ route('CheckCosts',['id' => $list->id]) }}" method="POST">
+                <form action="{{ route('CheckCosts', ['id' => $list->id]) }}" method="POST">
                     @csrf
                     <input type="hidden" name="id" value="{{ $list->id }}">
                     <div class="container">
@@ -108,7 +107,26 @@
                             </div>
                         </div>
                     </div>
-                
+
+                    {{-- <!-- แก้ไขไฟล์ infomation.blade.php -->
+                    <form method="POST" action="{{ route('admin.saveInfo') }}">
+                        @csrf
+
+                        <label>
+                            <input type="checkbox" name="TypeRenewIns" value="1"
+                                {{ old('TypeRenewIns') ? 'checked' : '' }}> ต่อ พรบ.
+                        </label>
+                        <br>
+                        <label>
+                            <input type="checkbox" name="TypeRenewTax" value="1"
+                                {{ old('TypeRenewTax') ? 'checked' : '' }}> ต่อ ภาษี
+                        </label>
+                        <br>
+
+                        <button type="submit">บันทึก</button>
+                    </form> --}}
+
+
                     <div class="d-flex justify-content-between align-items-center">
                         <a href="/info" class="btn my-3" style="background-color:#9fdffa"> กลับ</a>
                         <a href="/info" class="btn my-3" style="background-color:#F0DF2A">แก้ไข</a>

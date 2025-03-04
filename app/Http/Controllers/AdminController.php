@@ -10,35 +10,74 @@ use Carbon\Carbon;
 
 class AdminController extends Controller
 {
-    // public function storeHistory(Request $request){
+    public function updateDateRenew(Request $request)
+{
+    // try {
+    //     $request->validate([
+    //         'history_id' => 'required|integer|exists:histories,id',
+    //         'date_renew' => 'required|date',
+    //     ]);
 
+    //     DB::table('histories')->where('id', $request->history_id)->update([
+    //         'DateRenew' => $request->date_renew
+    //     ]);
 
+    //     return response()->json(['success' => true, 'message' => 'บันทึกสำเร็จ']);
+    // } catch (\Exception $e) {
+    //     return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
     // }
+    try {
+        $request->validate([
+            'history_id' => 'required|integer|exists:histories,id',
+            'date_renew' => 'required|date',
+        ]);
 
+        // อัปเดตวันที่และสถานะ
+        $updated = DB::table('histories')->where('id', $request->history_id)
+                    ->update([
+                        'DateRenew' => $request->date_renew,
+                        'status' => 1 // เปลี่ยนสถานะเป็น "เสร็จสิ้น"
+                    ]);
 
+        if ($updated) {
+            return response()->json(['success' => true, 'message' => 'บันทึกสำเร็จ']);
+        } else {
+            return response()->json(['success' => false, 'message' => 'บันทึกไม่สำเร็จ']);
+        }
+    } catch (\Exception $e) {
+        return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+    }
+
+}
 
     public function storeHistory(Request $request)
     {
 
-    $type_renew = [];
+    $type_ins = null;
+    $type_tax = null;
     if ($request->input('calculateRenew') == 1) {
-        $type_renew[] = 'พ.ร.บ.';
+        $type_ins = 1;
     }
-    if ($request->input('calculateTax') == 1) {
-        $type_renew[] = 'ภาษี';
+    else if ($request->input('calculateRenew') == 0) {
+        $type_ins = 0;
     }
 
-    // ถ้าไม่มีการเลือกประเภทการต่ออายุ ให้กำหนดเป็น 'none'
-    if (empty($type_renew)) {
-        $type_renew[] = 'none';
+    if ($request->input('calculateTax') == 1) {
+        $type_tax = 1;
     }
+    else if ($request->input('calculateTax') == 0) {
+        $type_tax = 0;
+    }
+
 
     $receive_option = $request->input('receive_option', '');
 
     $dataData=[
         'CarId' => $request->car_id, // บันทึก Car ID ที่ส่งมาจากฟอร์ม
         'DateRenew' => null, // บันทึกวันที่ทำรายการ
-        'TypeRenew' => implode(', ', $type_renew), // บันทึกประเภทการต่ออายุ (พรบ. หรือ ภาษี)
+        // 'TypeRenew' => implode(', ', $type_renew), // บันทึกประเภทการต่ออายุ (พรบ. หรือ ภาษี)
+        'TypeRenewIns' => $type_ins,
+        'TypeRenewTax' => $type_tax,
         'Receive' => $receive_option, // บันทึกการรับเอกสาร
         'ProofOfReceive' => null, // ยังไม่มีหลักฐานการรับ
         'SumCost' => $request->total_cost,
@@ -47,7 +86,7 @@ class AdminController extends Controller
 
     $List =  DB::table('histories as htr')
                  ->join('cars as c','htr.CarId','=','c.id')
-                 ->select('c.CarNumber','htr.Receive','htr.TypeRenew','c.id','c.BookOwner')
+                 ->select('c.CarNumber','htr.status','htr.Receive','htr.id','htr.TypeRenewIns','htr.TypeRenewTax','c.id','c.BookOwner')
                  ->get();
     // $cID = $List->id;
 
@@ -58,16 +97,17 @@ class AdminController extends Controller
 }
 
 
+    function showHis()
+    {
+        $List =  DB::table('histories as htr')
+                 ->join('cars as c','htr.CarId','=','c.id')
+                 ->select('c.CarNumber','htr.status','htr.Receive','htr.id','htr.TypeRenewIns','htr.TypeRenewTax','htr.DateRenew','c.BookOwner')
+                 ->get();
+    // $cID = $List->id;
+        // $his_id = $List->id;
 
-    // function showHis($id)
-    // {
-    //     $car = DB::table('cars')->where('id', $id)->first();
-    //     // $his = DB::table('histories as his')
-    //     // // ->join('cars as c','his.id','=','c.id')
-    //     // ->select('cars.CarNumber','cars.BookOwner','cars.SelectOption')
-    //     // ->get();
-    //     return view('history',compact('car'));
-    // }
+        return view('history',['list' => $List]);
+    }
 
 
 

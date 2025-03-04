@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
@@ -18,6 +19,8 @@
     <script src="//code.jquery.com/jquery-1.10.2.js"></script>
     <script src="//code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
     {{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> --}}
+
+
 
 
     <style>
@@ -258,10 +261,10 @@
             <div class="sidebar">
                 <a href="/info" class="{{ request()->is('info') ? 'active' : '' }}"><i class="bi bi-car-front"></i>
                     ข้อมูล</a>
-                <a href="/store-history" class="{{ request()->is('history') ? 'active' : '' }}"><i
+                <a href="/ShowHis" class="{{ request()->is('showHis') ? 'active' : '' }}"><i
                         class="bi bi-clock-history"></i> ประวัติทำรายการ</a>
-                <a href="/receive" class="{{ request()->is('receive') ? 'active' : '' }}"><i
-                        class="bi bi-box-seam"></i> การรับเอกสาร</a>
+                <a href="/receive" class="{{ request()->is('receive') ? 'active' : '' }}"><i class="bi bi-box-seam"></i>
+                    การรับเอกสาร</a>
                 <a href="/sum" class="{{ request()->is('sum') ? 'active' : '' }}"><i
                         class="bi bi-bar-chart-line-fill"></i> สรุปขข้อมูล</a>
                 <a href="/settings/general" class="{{ request()->is('settings/general') ? 'active' : '' }}"><i
