@@ -107,6 +107,14 @@
             font-weight: 400;
         }
 
+        #editInfo label {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+            font-weight: 400;
+        }
+
+
         select {
             -webkit-appearance: none;
             -moz-appearance: none;
