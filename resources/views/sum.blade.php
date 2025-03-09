@@ -2,71 +2,147 @@
 
 @section('content')
 <div class="container">
-    <h2>กราฟแสดงจำนวนประเภทรถที่เข้าใช้บริการ</h2>
-    <canvas id="barChart"></canvas>
+    <h3>กราฟแสดงจำนวนประเภทรถที่ต่อ พ.ร.บ. และภาษี</h3>
+    <hr>
+    <div class="row">
+        <div class="col-md-12">
+            <h5>การต่อ พ.ร.บ.</h5>
+            <canvas id="barChartInsurance"></canvas>
+        </div>
+        <hr>
+        <div class="col-md-12 mt-4">
+            <h5>การต่อภาษี</h5>
+            <canvas id="barChartTax"></canvas>
+        </div>
+        <hr>
+        <div class="col-md-8 mt-4">
+            <h5>รายได้รวมจากการต่อ พ.ร.บ. และภาษี</h5>
+            <canvas id="pieChartCost"></canvas>
+        </div>
+    </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js" integrity="sha512-JPcRR8yFa8mmCsfrw4TNte1ZvF1e3+1SdGMslZvmrzDYxS69J7J49vkFL8u6u8PlPJK+H3voElBtUCzaXj+6ig==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
 <script>
-    var ctx = document.getElementById('barChart').getContext('2d');
+    var ctxInsurance = document.getElementById('barChartInsurance').getContext('2d');
+    var ctxTax = document.getElementById('barChartTax').getContext('2d');
+    var ctxPieCost = document.getElementById('pieChartCost').getContext('2d');
 
-var chartData = {
-    labels: @json($CarChart->pluck('CarType')),
-    datasets: [{
-        label: 'จำนวนรถ',
-        data: @json($CarChart->pluck('total')),
-        backgroundColor: [
-            'rgba(255, 99, 132, 0.5)',  // สีแดง
-            'rgba(54, 162, 235, 0.5)',  // สีฟ้า
-            'rgba(255, 206, 86, 0.5)',  // สีเหลือง
-            'rgba(75, 192, 192, 0.5)',  // สีเขียว
-            'rgba(153, 102, 255, 0.5)'  // สีม่วง
-        ],
-        borderColor: [
-            'rgba(255, 99, 132, 1)',
-            'rgba(54, 162, 235, 1)',
-            'rgba(255, 206, 86, 1)',
-            'rgba(75, 192, 192, 1)',
-            'rgba(153, 102, 255, 1)'
-        ],
-        borderWidth: 1
-    }]
-};
+    var insuranceData = {
+        labels: @json($InsChart->pluck('InsuranceType')),
+        datasets: [{
+            label: 'จำนวนรถ',
+            data: @json($InsChart->pluck('total')),
+            backgroundColor: 'rgba(54, 162, 235, 0.5)',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 1
+        }]
+    };
 
-var barChart = new Chart(ctx, {
-    type: 'bar',
-    data: chartData,
-    options: {
-        scales: {
-            x: {
-                title: {
-                    display: true,
-                    text: 'ประเภทรถ',
-                    font: { size: 16 }
+    var taxData = {
+        labels: @json($TaxChart->pluck('TaxType')),
+        datasets: [{
+            label: 'จำนวนรถ',
+            data: @json($TaxChart->pluck('total')),
+            backgroundColor: 'rgba(255, 99, 132, 0.5)',
+            borderColor: 'rgba(255, 99, 132, 1)',
+            borderWidth: 1
+        }]
+    };
+
+    var costData = {
+        labels: ['พ.ร.บ.', 'ภาษี'],
+        datasets: [{
+            label: 'รายได้รวม (บาท)',
+            data: [
+                @json($InsCostChart->pluck('total_costIns')->sum()),
+                @json($TaxCostChart->pluck('total_costTax')->sum())
+            ],
+            backgroundColor: ['rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)'],
+            borderColor: ['rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)'],
+            borderWidth: 1
+        }]
+    };
+
+    new Chart(ctxInsurance, {
+        type: 'bar',
+        data: insuranceData,
+        options: {
+            scales: {
+                x: {
+                    title: { display: true, text: 'ประเภทรถที่ต่อพรบ.', font: { size: 16 } },
+                    ticks: { font: { size: 14 } },
+                    grid: { display: true, color: "rgba(200, 200, 200, 0.3)" }
                 },
-                ticks: { font: { size: 14 } },
-                grid: { display: true, color: "rgba(200, 200, 200, 0.3)" }
-            },
-            y: {
-                title: {
-                    display: true,
-                    text: 'จำนวนรถ (คัน)',
-                    font: { size: 16 }
-                },
-                ticks: { stepSize: 1, font: { size: 14 } },
-                grid: { display: true, color: "rgba(200, 200, 200, 0.3)" }
-            }
-        },
-        plugins: {
-            legend: {
-                display: true,
-                labels: { font: { size: 14 } }
+                y: {
+                    title: { display: true, text: 'จำนวนรถ (คัน)', font: { size: 16 } },
+                    ticks: { stepSize: 1, font: { size: 14 } },
+                    grid: { display: true, color: "rgba(200, 200, 200, 0.3)" }
+                }
             }
         }
-    }
-});
+    });
 
+    new Chart(ctxTax, {
+        type: 'bar',
+        data: taxData,
+        options: {
+            scales: {
+                x: {
+                    title: { display: true, text: 'ประเภทรถที่ต่อภาษี', font: { size: 16 } },
+                    ticks: { font: { size: 14 } },
+                    grid: { display: true, color: "rgba(200, 200, 200, 0.3)" }
+                },
+                y: {
+                    title: { display: true, text: 'จำนวนรถ (คัน)', font: { size: 16 } },
+                    ticks: { stepSize: 1, font: { size: 14 } },
+                    grid: { display: true, color: "rgba(200, 200, 200, 0.3)" }
+                }
+            }
+        }
+    });
 
+    // กราฟวงกลม (Pie Chart) สำหรับรายได้รวม
+    new Chart(ctxPieCost, {
+        type: 'pie',
+        data: costData,
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+
+                tooltip: {
+                    callbacks: {
+                        label: function(tooltipItem) {
+                            return tooltipItem.label + ': ' + tooltipItem.raw.toLocaleString() + ' บาท';
+                        }
+                    }
+                },
+
+                DataLabels: {
+                    display: true,  // ให้แสดงข้อมูลทันที
+                    color: 'black',
+                    formatter: function(value, context) {
+                        var total = context.dataset.data.reduce(function(total, num) {
+                            return total + num;
+                        }, 0);
+                        var percentage = (value / total * 100).toFixed(2);  // คำนวณเปอร์เซ็นต์
+                        return value.toLocaleString() + ' บาท\n(' + percentage + '%)'; // แสดงจำนวนเงินและเปอร์เซ็นต์
+                    },
+                    font: {
+                        weight: 'bold',
+                        size: 14
+                    }
+                }
+
+            }
+        }
+        // plugins : [ChartDataLabels]
+    });
 </script>
 @endsection

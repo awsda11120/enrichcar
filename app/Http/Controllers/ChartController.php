@@ -3,20 +3,35 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Car; // นำเข้า Model ที่ใช้ดึงข้อมูล
+use App\Models\Car;
+use App\Models\History;
+
 
 class ChartController extends Controller
 {
     public function CarChart()
-    {
-        // ดึงข้อมูลจากฐานข้อมูล (เช่น นับจำนวนแต่ละประเภท)
-        $CarChart = Car::selectRaw('CarType, COUNT(*) as total')
-                            ->groupBy('CarType')
-                            ->get();
+{
+    $InsChart = Car::selectRaw('InsuranceType, COUNT(*) as total')
+                        ->groupBy('InsuranceType')
+                        ->get();
 
-        // ส่งข้อมูลไปที่หน้า View
-        return view('sum', compact('CarChart'));
-    }
+    $TaxChart = Car::selectRaw('TaxType, COUNT(*) as total')
+                        ->groupBy('TaxType')
+                        ->get();
 
-    //ภาษาไทย
+    $InsCostChart = Car::join('histories', 'cars.id', '=', 'histories.CarId')
+                        ->selectRaw('cars.InsuranceType, SUM(histories.SumCost) as total_costIns')
+                        ->groupBy('cars.InsuranceType')
+                        ->get();
+
+
+    $TaxCostChart = Car::join('histories', 'cars.id', '=', 'histories.CarId')
+                        ->selectRaw('cars.TaxType, SUM(histories.SumCost) as total_costTax')
+                        ->groupBy('cars.TaxType')
+                        ->get();
+
+    return view('sum', compact('InsChart', 'TaxChart', 'InsCostChart', 'TaxCostChart'));
+}
+
+
 }
