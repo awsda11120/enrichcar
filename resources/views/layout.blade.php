@@ -19,7 +19,7 @@
     <script src="//code.jquery.com/jquery-1.10.2.js"></script>
     <script src="//code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
     {{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> --}}
-    
+
 
 
 
@@ -99,13 +99,20 @@
             border: #EC0000 1px solid;
         }
 
-        /* addinfo form */
         #addinfo label {
             margin-top: 20px;
             font-size: 14px;
             color: #666;
             font-weight: 400;
         }
+
+        #editInfo label { 
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+            font-weight: 400;
+        }
+
 
         select {
             -webkit-appearance: none;
@@ -132,7 +139,7 @@
             background-color: white;
         } */
 
-        .ins-red {
+        /* .ins-red {
             background-color: #FFCCCC !important;
         }
 
@@ -149,23 +156,29 @@
 
         .tax-yellow {
             background-color: #FFFF99 !important;
-        }
+        } */
 
 
 
         /* end add info form */
-        /* .errMsg ul li{
+        .errMsg ul li{
             list-style: none;
             color:#EC0000;
         }
         .bg_danger td {
-            background:#da5060!important;
+            background:#f87979!important;
             color:##000;
         }
+
         .bg_warning td {
-            background:#ffe658!important;
+            background:#FFFF99!important;
             color:#000;
         }
+        .bg_expire td{
+            background:#D3D3D3!important;
+            color:#000;
+        }
+        /*
         .exp {
             background-color: gray !important;
         }
@@ -242,7 +255,7 @@
 <body style="background-color: #FDF5F4;">
     <nav class="navbar navbar-expand-lg" style="background-color: #F7CBC7;">
         <div class="container-fluid">
-            <a class="navbar-brand" href="/info">EINS system</a>
+            <a class="navbar-brand" href="/">EINS system</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>

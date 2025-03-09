@@ -5,6 +5,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\CalculateController;
 use App\Http\Controllers\ChartController;
+use Illuminate\Support\Facades\Storage;
 
 // Route::get('/', [Admincontroller::class,'info']);
 Route::get('/', function () {
@@ -27,8 +28,8 @@ Route::get('deleteCus/{id}',[AdminController::class,'deleteCus'])->name('deleteC
 Route::get('deleteCar/{id}',[AdminController::class,'deleteCar'])->name('deleteCar');
 Route::get('editCus/{id}',[AdminController::class,'editCus'])->name('editCus');
 Route::get('editCar/{id}',[AdminController::class,'editCar'])->name('editCar');
-Route::post('updateCus/{id}',[AdminController::class,'updateCus'])->name('updateCus');
-Route::post('updateCar/{id}',[AdminController::class,'updateCar'])->name('updateCar');
+// Route::post('updateCus/{id}',[AdminController::class,'updateCus'])->name('updateCus');
+// Route::post('updateCar/{id}',[AdminController::class,'updateCar'])->name('updateCar');
 
 
 Route::get('/settings/general/{category}', [SettingsController::class, 'index']);
@@ -56,4 +57,6 @@ Route::post('/store-history', [AdminController::class, 'storeHistory'])->name('s
 Route::post('/update-date-renew', [AdminController::class, 'updateDateRenew'])->name('updateDateRenew');
 
 
-
+// Route::get('/upload/{filename}', function ($filename) {
+//     return response()->file(storage_path('upload\doc' . $filename));
+// });

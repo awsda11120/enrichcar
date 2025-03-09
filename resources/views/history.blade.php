@@ -23,7 +23,7 @@
         </div>
     </div>
     <hr>
-    <table class="table  table-grid">
+    <table class="table table-grid">
         <thead class="text-center">
             <tr>
                 <th scope="col">วันที่ดำเนินการต่อ</th>
@@ -59,12 +59,21 @@
                         @endif
                     </td>
                     <td>{{ $item->Receive }}</td>
-                    <td>{{ $item->id }}</td>
+                    <td>
+                        @if (!empty($item->BookOwner))
+                            <a href="{{ asset('upload\doc/' . $item->BookOwner) }}" download class="btn btn-sm"
+                                style="background-color: #A2D7FF;">
+                                ดาวน์โหลด
+                            </a>
+                        @else
+                            <span class="text-muted">ไม่มีไฟล์</span>
+                        @endif
+                    </td>
                     <td style="background:#FFF!important;">
                         <button class="btn btn-light btn-sm complete-btn" data-id="{{ $item->id }}"
                             style="background-color: {{ $item->status == 1 ? '#ccc' : '#A4F02A' }}"
                             {{ $item->status == 1 ? 'disabled' : '' }}>
-                            {{ $item->status == 1 ? 'เสร็จสิ้นแล้ว' : 'เสร็จสิ้น' }}
+                            {{ $item->status == 1 ? 'เสร็จสิ้น' : 'เสร็จสิ้น' }}
                         </button>
                     </td>
                     <td>
@@ -86,34 +95,37 @@
                 autoclose: true,
                 todayHighlight: true
             });
-    
+
             // คลิกปุ่ม "แก้ไข"
             $('.edit-btn').click(function() {
                 let historyId = $(this).data('id');
                 let dateRenew = $(this).data('date');
                 let row = $(this).closest('tr');
-    
+
                 // เปิดให้เลือกวันที่ใหม่
                 let dateInput = row.find('.date-renew-input');
                 dateInput.removeAttr('readonly');
                 dateInput.val(dateRenew); // กำหนดวันที่เดิมให้แสดงในช่อง
-    
-                // เปลี่ยนสีของปุ่ม "เสร็จสิ้น" เป็นสีเขียว
-                row.find('.complete-btn').css("background-color", "#A4F02A").prop("disabled", false);
+
+                // เปลี่ยนสีของปุ่ม "เสร็จสิ้น" เป็นสีเขียว และเปิดให้คลิกได้
+                row.find('.complete-btn').css({
+                    "background-color": "#A4F02A",
+                    "cursor": "pointer" // เปลี่ยน cursor เป็น pointer เพื่อให้สามารถคลิกได้
+                }).prop("disabled", false);
             });
-    
+
             // คลิกปุ่ม "เสร็จสิ้น"
             $('.complete-btn').click(function() {
                 let historyId = $(this).data('id');
                 let dateRenew = $(this).closest('tr').find('.date-renew-input').val();
                 let button = $(this);
-    
+
                 // ตรวจสอบว่าได้เลือกวันที่หรือไม่
                 if (!dateRenew) {
                     alert('กรุณาเลือกวันที่ก่อนกดปุ่มเสร็จสิ้น');
                     return;
                 }
-    
+
                 $.ajax({
                     url: "{{ route('updateDateRenew') }}",
                     type: "POST",
@@ -127,9 +139,9 @@
                             // เปลี่ยนปุ่ม "เสร็จสิ้น" เป็นสีทึบ (#ccc) และไม่ให้คลิกได้
                             button.css({
                                 "background-color": "#ccc",
-                                "cursor": "not-allowed"
-                            }).prop("disabled", true).text("เสร็จสิ้นแล้ว");
-    
+                                "cursor": "not-allowed" // เปลี่ยน cursor กลับเป็น not-allowed เพื่อบ่งบอกว่าไม่สามารถคลิกได้
+                            }).prop("disabled", true).text("เสร็จสิ้น");
+
                             alert('วันที่ถูกบันทึกเรียบร้อยแล้ว');
                         } else {
                             alert("เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง");
@@ -141,5 +153,6 @@
                 });
             });
         });
-    </script>    
+    </script>
+
 @endsection

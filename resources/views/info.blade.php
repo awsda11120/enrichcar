@@ -64,7 +64,7 @@
         </thead>
         <tbody class="text-center">
             @foreach ($list as $item)
-                @php
+                {{-- @php
                     // คำนวณจำนวนวันคงเหลือ
                     $insDaysLeft = (strtotime($item->next_Ins) - time()) / (60 * 60 * 24);
                     $taxDaysLeft = (strtotime($item->renew) - time()) / (60 * 60 * 24);
@@ -90,17 +90,17 @@
                     } elseif ($taxDaysLeft <= 90) {
                         $taxColor = 'background-color: #FFFF99 !important;'; // สีเหลือง
                     }
-                @endphp
+                @endphp --}}
 
                 <tr>
                     <td>{{ $item->CarNumber }}</td>
                     <td>{{ $item->CustomerName }}</td>
                     <td>{{ $item->PhoneNumber }}</td>
-                    <td style="{{ $insColor ?? '' }}" data-ins-exp="{{ $insDaysLeft < 90 ? 'yes' : 'no' }}">
+                    <td >
                         {{ $item->next_Ins }}
                     </td>
-                    <td style="{{ $taxColor ?? '' }}" data-tax-exp="{{ $taxDaysLeft < 90 ? 'yes' : 'no' }}">
-                        {{ $item->renew }}
+                    <td >
+                        {{ $item->tax_expiry_date }}
                     </td>
                     <td>
                         <a href="{{ route('infomation', $item->id) }}" class="btn btn-light btn-sm"

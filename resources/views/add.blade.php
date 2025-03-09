@@ -120,7 +120,7 @@
                                     </div>
                                 @enderror
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-4">
                                 <label for="InsuranceType" class="form-label">ประเภท พ.ร.บ.</label>
                                 <select name="InsuranceType" class="form-select">
                                     <option selected>เลือก...</option>
@@ -134,7 +134,7 @@
                                     </div>
                                 @enderror
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-5">
                                 <label for="TaxType" class="form-label">ประเภทภาษี</label>
                                 <select name="TaxType" class="form-select">
                                     <option selected>เลือก...</option>

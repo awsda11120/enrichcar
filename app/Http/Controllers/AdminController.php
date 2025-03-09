@@ -12,20 +12,7 @@ class AdminController extends Controller
 {
     public function updateDateRenew(Request $request)
 {
-    // try {
-    //     $request->validate([
-    //         'history_id' => 'required|integer|exists:histories,id',
-    //         'date_renew' => 'required|date',
-    //     ]);
-
-    //     DB::table('histories')->where('id', $request->history_id)->update([
-    //         'DateRenew' => $request->date_renew
-    //     ]);
-
-    //     return response()->json(['success' => true, 'message' => 'บันทึกสำเร็จ']);
-    // } catch (\Exception $e) {
-    //     return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
-    // }
+    
     try {
         $request->validate([
             'history_id' => 'required|integer|exists:histories,id',
@@ -86,7 +73,7 @@ class AdminController extends Controller
 
     $List =  DB::table('histories as htr')
                  ->join('cars as c','htr.CarId','=','c.id')
-                 ->select('c.CarNumber','htr.status','htr.Receive','htr.id','htr.TypeRenewIns','htr.TypeRenewTax','c.id','c.BookOwner')
+                 ->select('c.CarNumber','htr.status','htr.Receive','htr.id','htr.TypeRenewIns','htr.TypeRenewTax','c.id','htr.DateRenew','c.BookOwner')
                  ->get();
     // $cID = $List->id;
 
@@ -139,33 +126,41 @@ class AdminController extends Controller
 
 
 
-            $register_day = date_create(date('Y-m-d',strtotime($tax)));
-            $today = date_create(date('Y-m-d'));
-            $diff = date_diff($register_day,$today);
-            $days = (int)$diff->format('%a')%365;     // เศษวัน
-            $total_year = floor((int)$diff->format('%a')/365);           // $regArr[1] = month
-            $regArr = explode("-",$tax);  // y , m , d =>$regArr[2] = day
-            // update year
-            $regArr[0] +=  $total_year;
-            $regArr[0] +=  ($days>0) ? 1 : 0;
-
-
-            //calculate days to renew from today
-            $date_renew =  date_create(date('Y-m-d',strtotime(implode("-",$regArr))));
-            $due_date_diff = date_diff($today,$date_renew);
-            $days = (int)$due_date_diff->format('%a')%365;
-            // $List[$index]->days = $days;
-            // $List[$index]->cls = ($days<=$d_danger) ? "bg_danger" : (($days>$d_danger&&$days<=$d_warning) ? "bg_warning" : "") ;
-            // $List[$index]->disabled = ($days<=$d_danger) ? "" : "disabled" ;
-            $date = (date('Y-m-d',strtotime($ins))); // Replace with your date
-            $newDate = date('d/m/Y', strtotime('+365 days', strtotime($date)));
-            // $List[$index]->next_Ins = $newDate;
-            $ins = date('Y-m-d',strtotime('+365 days', strtotime($date)));
-            $ins = date_create($ins);
-            $diff_ins = date_diff($today,$ins);
-            $days_ins = (int)$diff_ins->format('%a')%365;
-
-            echo"<br>".$days_ins."=>".$days;
+        $register_day = date_create(date('Y-m-d',strtotime($tax)));
+        $today = date_create(date('Y-m-d'));
+        $diff = date_diff($register_day, $today);
+        $days = (int)$diff->format('%a') % 365;     // เศษวัน
+        $total_year = floor((int)$diff->format('%a') / 365);           // $regArr[1] = month
+        $regArr = explode("-", $tax);  // y , m , d =>$regArr[2] = day
+        // update year
+        $regArr[0] +=  $total_year;
+        $regArr[0] +=  ($days > 0) ? 1 : 0;
+        
+        
+        // calculate days to renew from today
+        $date_renew = date_create(date('Y-m-d', strtotime(implode("-", $regArr))));
+        $due_date_diff = date_diff($today, $date_renew);
+        $days = (int)$due_date_diff->format('%a') % 365;
+        // $List[$index]->days = $days;
+        // $List[$index]->cls = ($days <= $d_danger) ? "bg_danger" : (($days > $d_danger && $days <= $d_warning) ? "bg_warning" : "") ;
+        // $List[$index]->disabled = ($days <= $d_danger) ? "" : "disabled" ;
+        $date = (date('Y-m-d', strtotime($ins))); // Replace with your date
+        $newDate = date('d/m/Y', strtotime('+365 days', strtotime($date)));
+        // $List[$index]->next_Ins = $newDate;
+        $ins = date('Y-m-d', strtotime('+365 days', strtotime($date)));
+        $ins = date_create($ins);
+        $diff_ins = date_diff($today, $ins);
+        
+        // ตรวจสอบว่า $ins อยู่ในอดีตหรือไม่ ถ้าอยู่ในอดีตให้แสดงค่าเป็นลบ
+        if ($ins < $today) {
+            // ถ้า $ins เก่ากว่า $today ให้ผลลัพธ์เป็นค่าลบ
+            $days_ins = -(int)$diff_ins->format('%a') % 365;
+        } else {
+            // ถ้า $ins อยู่ในอนาคตหรือวันนี้
+            $days_ins = (int)$diff_ins->format('%a') % 365;
+        }
+        
+        echo "<br>" . $days_ins . " => " . $days;
 
 
 
@@ -175,13 +170,10 @@ class AdminController extends Controller
 
     }
 
-
-
-    
     function info(){
         $List =  DB::table('cars as c')
                  ->join('customers as cs','c.CusId','=','cs.id')
-                 ->select('c.CarNumber','c.RegistrationDate','c.InsHistoryDate','cs.CustomerName','cs.PhoneNumber','cs.id','c.BookOwner','c.id')
+                 ->select('c.CarNumber','c.TaxHistoryDate','c.RegistrationDate','c.InsHistoryDate','cs.CustomerName','cs.PhoneNumber','cs.id','c.BookOwner','c.id')
                  ->get();
 
         // calculate to renew ins
@@ -192,23 +184,36 @@ class AdminController extends Controller
             $ins_danger = 30;
 
 
-            $register_day = date_create(date('Y-m-d',strtotime($item->RegistrationDate)));
-            $today = date_create(date('Y-m-d'));
-            $diff = date_diff($register_day,$today);
-            $days = (int)$diff->format('%a')%365;     // เศษวัน
-            $total_year = floor((int)$diff->format('%a')/365);           // $regArr[1] = month
-            $regArr = explode("-",$item->RegistrationDate);  // y , m , d =>$regArr[2] = day
-            // update year
-            $regArr[0] +=  $total_year;
-            $regArr[0] +=  ($days>0) ? 1 : 0;
+            $today = date_create(date('Y-m-d')); // วันที่ปัจจุบัน
 
-            // repack renew day
-            $List[$index]->renew = implode("/",array_reverse($regArr));
+            // แยกวัน, เดือน, ปี จาก RegistrationDate
+            $regArr = explode("-", $item->RegistrationDate);
+            $regDay = $regArr[2];  // วัน
+            $regMonth = $regArr[1]; // เดือน
+            $regYear = $regArr[0]; // ปี
+    
+            // ใช้ TaxHistoryDate เป็นฐานในการคำนวณปี
+            $taxExpireDate = date_create($item->TaxHistoryDate); // วันต่อภาษีครั้งล่าสุด
+            $taxExpireDate->modify('+1 year'); // เพิ่ม 1 ปีจากวันต่อภาษี
+    
+            // ใช้ปีจาก TaxHistoryDate แต่ใช้วันเดือนจาก RegistrationDate
+            $taxExpireDate->setDate($taxExpireDate->format('Y'), $regMonth, $regDay); // เปลี่ยนปีจาก TaxHistoryDate และใช้เดือน/วันจาก RegistrationDate
+    
+            // เก็บวันที่หมดอายุภาษี
+            $List[$index]->tax_expiry_date = $taxExpireDate->format('d/m/Y'); // วันหมดอายุภาษีในรูปแบบ วัน/เดือน/ปี
+    
+            // คำนวณจำนวนวันที่เหลือจนถึงวันหมดอายุภาษี
+            $diff = date_diff($today, $taxExpireDate); // ความต่างระหว่างวันที่ปัจจุบันและวันหมดอายุภาษี
+            $days_left = (int)$diff->format('%a'); // จำนวนวันเหลือจนถึงวันหมดอายุภาษี
+    
+            // เก็บจำนวนวันที่เหลือ
+            $List[$index]->tax_days_left = $days_left;
 
             //calculate days to renew from today
-            $date_renew =  date_create(date('Y-m-d',strtotime(implode("-",$regArr))));
-            $due_date_diff = date_diff($today,$date_renew);
-            $days = (int)$due_date_diff->format('%a')%365;
+            // $date_renew =  date_create(date('Y-m-d',strtotime(implode("-",$regArr))));
+            // $due_date_diff = date_diff($today,$date_renew);
+            // $days = (int)$due_date_diff->format('%a')%365;
+
             // $List[$index]->days = $days;
             // $List[$index]->cls = ($days<=$d_danger) ? "bg_danger" : (($days>$d_danger&&$days<=$d_warning) ? "bg_warning" : "") ;
             // $List[$index]->disabled = ($days<=$d_danger) ? "" : "disabled" ;
@@ -219,58 +224,14 @@ class AdminController extends Controller
             $ins = date_create($ins);
             $diff_ins = date_diff($today,$ins);
             $days_ins = (int)$diff_ins->format('%a')%365;
-            // $List[$index]->cls2 = ($days_ins<=$d_danger) ? "bg_danger" : (($days_ins>$d_danger&&$days<=$d_warning) ? "bg_warning" : "") ;
-            // $List[$index]->disabled = ($days_ins<=$d_danger) ? "" : "disabled" ;
-            // echo"<br>".$diff;
-            //  echo"<br>".$days_ins."=>".$days;
-            // if ($days <= $d_danger) {
-            //     $List[$index]->cls = "bg_danger";
-            // } elseif ($days > $d_danger && $days <= $d_warning) {
-            //     $List[$index]->cls = "bg_warning";
-            // }
 
-            // elseif ($days_ins <= $ins_danger) {
-            //     $List[$index]->cls = "ins_danger";
-            // } elseif ($days_ins > $ins_danger && $days_ins <= $ins_warning) {
-            //     $List[$index]->cls = "ins_warning";
-            // } else {
-            //     $List[$index]->cls = ""; // no class if it doesn't match the conditions
-            //     // $List[$index]->cls = ""; // no class if it doesn't match the conditions
-            // }
-
+            $register_day = date_create(date('Y-m-d',strtotime($item->RegistrationDate)));
+            // $today = date_create(date('Y-m-d'));
+            $diff_register = date_diff($register_day,$today);
+            $days = (int)$diff_register->format('%a')%365;     // เศษวัน
+            $total_year = floor((int)$diff_register->format('%a')/365);
+            
         }
-
-        // foreach ($List as $index => $item) {
-        //     $d_warning = 90;
-        //     $d_danger = 30;
-        //     $d_null;
-
-        //     $date = (date('Y-m-d',strtotime($item->InsHistoryDate))); // Replace with your date
-        //     $newDate = date('d/m/Y', strtotime('+365 days', strtotime($date)));
-        //     $List[$index]->next_Ins = $newDate;
-        //     // $Ins_HisDay = date_create(date('Y-m-d',strtotime($item->InsHistoryDate)));
-        //     $today = date_create(date('Y-m-d'));
-        //     // $diff = date_diff($today,$Ins_HisDay);
-        //     // $days = (int)$diff->format('%a');
-        //     // // $List[$index]->next_Ins = $diff;
-        //     // if ($days >= 270 && $days <= 330) {
-        //     //     $List[$index]->cls = "bg_warning";
-        //     // } else if ($days >= 330 && $days <= 365) {
-        //     //     $List[$index]->cls = "bg_danger";
-        //     // } else if($days >= 365){
-        //     //     $List[$index]->cls = "";
-        //     // }
-        //     // $List[$index]->disabled = ($days<=$d_danger) ? "" : "disabled" ;
-
-        //     $ins = date('Y-m-d',strtotime('+365 days', strtotime($date)));
-        //     $ins = date_create($ins);
-        //     $diff_ins = date_diff($today,$ins);
-        //     $days_ins = (int)$diff_ins->format('%a')%365;
-        //     $List[$index]->cls2 = ($days_ins<=$d_danger) ? "bg_danger" : (($days_ins>$d_danger&&$days<=$d_warning) ? "bg_warning" : "") ;
-        //     $List[$index]->disabled = ($days_ins<=$d_danger) ? "" : "disabled" ;
-        //     // echo"<br>".$diff;
-        //      echo"<br>".$days_ins;
-        // }\
 
         session(['total_year' => $total_year]);
         return view('info',["list"=>$List]);
@@ -445,13 +406,27 @@ class AdminController extends Controller
 
 
     function editInfo($id){
-        $customer=DB::table('customers')->where('id',$id)->first();
-        $car=DB::table('cars')->where('id',$id)->first();
+        $List = DB::table('cars as c')
+        ->join('customers as cs', 'c.CusId', '=', 'cs.id')
+        ->join('settings_renew as sr', 'sr.cartype_id', '=', 'c.TypeId')
+        ->join('taxes as t', 't.id', '=', 'c.TaxId')
+        ->select('c.id','c.CarNumber','c.CarCity','c.RegistrationDate','c.BookOwner', 'cs.CustomerName', 'cs.NationalID', 'cs.PhoneNumber',
+            'cs.Address', 'c.SelectOption', 'c.TaxHistoryDate', 'c.InsHistoryDate', 'c.TaxId',
+            'c.CarCC', 'c.CarWeight','t.name','c.TaxType', 'c.InsuranceType', 'c.TypeId', 'sr.renew_cost', 'sr.fee', 'sr.delivery_cost')
+        ->where('c.id', $id)
+        ->first();
+        $tax = $List->TaxId;
+
+        // if($tax==1)
+        // $customer=DB::table('customers')->where('id',$id)->first();
+        // $car=DB::table('cars')->where('id',$id)->first();
         $provinces = DB::table('provinces')->get();
+        $taxes = DB::table('taxes')->get();
         $settings["type"] = DB::table('settings')->where('category_key','=','car_type')->get();
         // $settings["brand"] = DB::table('settings')->where('category_key','=','car_brand')->get();
+        return view('editInfo',["list"=>$List,'prov'=>$provinces,'sett'=>$settings,'taxes'=>$taxes]);
 
-        return view('editInfo', compact('customer','car'),['prov'=>$provinces,'sett'=>$settings]);
+        // return view('editInfo', compact('customer','car'),['prov'=>$provinces,'sett'=>$settings]);
     }
 
     function updateInfo(Request $requestInfo, $id){
@@ -558,32 +533,32 @@ class AdminController extends Controller
                 }
             }
         // find duplicate the customer by  national id number.
-        $findCus =  DB::table('customers')->where('NationalID',$requestInfo->NationalID)->first();
-        $rows = count((array)$findCus);
-        if(!$rows){
-            $CusID = DB::table('customers')->insertGetId($dataCus);
-            $dataCar["CusId"] = $CusID;
-        }else{
-            $dataCar["CusId"] = $findCus->id;
-            $errorMsg[] = 'พบข้อมูลบัตรประชาชนถูกใช้งานแล้ว';
-        }
+        // $findCus =  DB::table('customers')->where('NationalID',$requestInfo->NationalID)->first();
+        // $rows = count((array)$findCus);
+        // if(!$rows){
+        //     $CusID = DB::table('customers')->insertGetId($dataCus);
+        //     $dataCar["CusId"] = $CusID;
+        // }else{
+        //     $dataCar["CusId"] = $findCus->id;
+        //     $errorMsg[] = 'พบข้อมูลบัตรประชาชนถูกใช้งานแล้ว';
+        // }
 
-        // find duplicate the car by plate number.
-        $findCar =  DB::table('cars')->where('CarNumber',$PlateNumber)->first();
-        $rows = count((array)$findCar);
-        if(!$rows){
-            DB::table('cars')->insert($dataCar);
-        }else{
-            $errorMsg[] = 'ป้ายทะเบียนนี้ถูกใช้งานแล้ว';
-        }
-        $Url = (count($errorMsg)) ? '/info' : '/info';
+        // // find duplicate the car by plate number.
+        // $findCar =  DB::table('cars')->where('CarNumber',$PlateNumber)->first();
+        // $rows = count((array)$findCar);
+        // if(!$rows){
+        //     DB::table('cars')->insert($dataCar);
+        // }else{
+        //     $errorMsg[] = 'ป้ายทะเบียนนี้ถูกใช้งานแล้ว';
+        // }
+        // $Url = (count($errorMsg)) ? '/info' : '/info';
 
 
 
         // DB::table('cus_and_cars')->insert($dataCusAndCar);
-        DB::table('customers')->where('id',$id)->update($dataCustomer);
+        DB::table('customers')->where('id',$id)->update($dataCus);
         DB::table('cars')->where('id',$id)->update($dataCar);
-        return redirect('infomation');
+        return redirect('/info');
 
     }
 }
