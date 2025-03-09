@@ -39,7 +39,7 @@ class AdminController extends Controller
 
     public function storeHistory(Request $request)
     {
-    
+
     $type_ins = null;
     $type_tax = null;
     if ($request->input('calculateRenew') == 1) {
@@ -55,9 +55,9 @@ class AdminController extends Controller
     else if ($request->input('calculateTax') == 0) {
         $type_tax = 0;
     }
-    
 
-    $receive_option = $request->input('receive_option', ''); 
+
+    $receive_option = $request->input('receive_option', '');
 
     $dataData=[
         'CarId' => $request->car_id, // บันทึก Car ID ที่ส่งมาจากฟอร์ม
@@ -83,7 +83,6 @@ class AdminController extends Controller
 
 }
 
-    
 
     function showHis()
     {
@@ -180,8 +179,9 @@ class AdminController extends Controller
         foreach ($List as $index => $item) {
             $d_warning = 90;
             $d_danger = 30;
-            $ins_warning = 90;
-            $ins_danger = 30;
+            $d_expire = 0;
+            // $ins_warning = 90;
+            // $ins_danger = 30;
 
 
             $today = date_create(date('Y-m-d')); // วันที่ปัจจุบัน
@@ -237,7 +237,7 @@ class AdminController extends Controller
         return view('info',["list"=>$List]);
 
     }
-    
+
 
     function sum()
     {

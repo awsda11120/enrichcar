@@ -3,31 +3,26 @@
 @section('content')
     <div class="container">
         <div class="input-group mb-3 d-flex align-items-center">
-            <!-- ตัวเลือกการแสดงข้อมูล -->
+
             <div class="col-md-2 me-3">
                 <select id="CarFilter" class="form-select">
-                    <option value="all" selected>แสดงข้อมูล...</option>
                     <option value="all">แสดงข้อมูลทั้งหมด</option>
-                    <option value="ins_expiring">แสดงข้อมูลที่ พ.ร.บ จะหมดอายุ</option>
-                    <option value="tax_expiring">แสดงข้อมูลที่ ภาษี จะหมดอายุ</option>
+                    <option value="insurance">แสดงข้อมูลที่ พ.ร.บ จะหมดอายุ</option>
+                    <option value="tax">แสดงข้อมูลที่ ภาษี จะหมดอายุ</option>
                 </select>
             </div>
 
-            <!-- ค้นหา -->
+
             <form class="d-flex col-md-2 " role="search">
                 <input id="searchInput" class="form-control me-2" type="search" aria-label="Search"
                     placeholder="ค้นหาเลขทะเบียน...">
-                {{-- <button class="btn" style="background-color: #F7CBC7" type="submit">
-                    <i class="bi bi-search"></i>
-                </button> --}}
+
             </form>
 
-            <!-- ปุ่มเพิ่มข้อมูล -->
             <span><a href="add" class="btn mx-2" style="background-color:#A4F02A">เพิ่มข้อมูล</a></span>
 
-            <!-- ตัวบ่งชี้สี -->
             <div class="d-flex align-items-center ms-auto">
-                <span class="color-box" style="background-color: #ff7d7d;"></span>
+                <span class="color-box" style="background-color: #f87979;"></span>
                 <span class="me-3"> พ.ร.บ./ภาษีจะหมดอายุใน 30 วัน</span>
 
                 <span class="color-box" style="background-color: #FFFF99;"></span>
@@ -114,30 +109,39 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function() {
-            // ฟังก์ชันกรองข้อมูล
-            $('#CarFilter').change(function() {
-                let filter = $(this).val();
-                $('tbody tr').show();
+            function filterData() {
+                let searchValue = $('#searchInput').val().toLowerCase();
+                let filterValue = $('#CarFilter').val();
 
-                if (filter === 'ins_expiring') {
-                    $('tbody tr').filter(function() {
-                        return $(this).attr('data-ins-exp') !== 'yes';
-                    }).hide();
-                } else if (filter === 'tax_expiring') {
-                    $('tbody tr').filter(function() {
-                        return $(this).attr('data-tax-exp') !== 'yes';
-                    }).hide();
-                }
-            });
+                $('tbody tr').each(function() {
+                    let carNumber = $(this).find('td:first').text().toLowerCase();
+                    let insDaysLeft = parseInt($(this).data('ins-days'), 10);
+                    let taxDaysLeft = parseInt($(this).data('tax-days'), 10);
+                    let showRow = true;
 
-            // ฟังก์ชันค้นหาจากเลขทะเบียน
-            $('#searchInput').on('keyup', function() {
-                let value = $(this).val().toLowerCase();
-                $('tbody tr').filter(function() {
-                    $(this).toggle($(this).find('td:first').text().toLowerCase().indexOf(value) > -
-                        1);
+                    // กรองตามเลขทะเบียน
+                    if (!carNumber.includes(searchValue)) {
+                        showRow = false;
+                    }
+
+                    // กรองตามตัวเลือกฟิลเตอร์
+                    if (filterValue === 'insurance' && !(insDaysLeft <= 90)) {
+                        showRow = false;
+                    } else if (filterValue === 'tax' && !(taxDaysLeft <= 90)) {
+                        showRow = false;
+                    }
+
+                    $(this).toggle(showRow);
                 });
-            });
+            }
+
+            // ค้นหาตามเลขทะเบียน
+            $('#searchInput').on('keyup', filterData);
+            // เปลี่ยนตัวเลือกฟิลเตอร์
+            $('#CarFilter').on('change', filterData);
         });
     </script>
+
+
+
 @endsection
