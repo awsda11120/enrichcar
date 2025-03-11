@@ -95,41 +95,22 @@
                 <form action="{{ route('CheckCosts', ['id' => $list->id]) }}" method="POST">
                     @csrf
                     <input type="hidden" name="id" value="{{ $list->id }}">
+
                     <div class="container">
                         <div class="row">
                             <div class="form-check form-check col-md-3 offset-md-10">
                                 <input type="checkbox" name="renew_prb" value="1"
-                                    @if ($days_ins > 90) disabled @endif > ต่อ พ.ร.บ.
+                                    @if ($list->days_ins > 90) disabled @endif> ต่อ พ.ร.บ.
                             </div>
                             <div class="form-check form-check col-md-3 offset-md-10">
                                 <input type="checkbox" name="renew_tax" value="1"
-                                    @if ($days > 90) disabled @endif > ต่อภาษี
+                                    @if ($list->days > 90) disabled @endif> ต่อภาษี
                             </div>
                         </div>
                     </div>
 
-                    {{-- <!-- แก้ไขไฟล์ infomation.blade.php -->
-                    <form method="POST" action="{{ route('admin.saveInfo') }}">
-                        @csrf
-
-                        <label>
-                            <input type="checkbox" name="TypeRenewIns" value="1"
-                                {{ old('TypeRenewIns') ? 'checked' : '' }}> ต่อ พรบ.
-                        </label>
-                        <br>
-                        <label>
-                            <input type="checkbox" name="TypeRenewTax" value="1"
-                                {{ old('TypeRenewTax') ? 'checked' : '' }}> ต่อ ภาษี
-                        </label>
-                        <br>
-
-                        <button type="submit">บันทึก</button>
-                    </form> --}}
-
-
                     <div class="d-flex justify-content-between align-items-center">
                         <a href="/info" class="btn my-3" style="background-color:#9fdffa"> กลับ</a>
-                        <a href="{{ route('editInfo', ['id' => $list->id]) }}" class="btn my-3" style="background-color:#F0DF2A">แก้ไข</a>
                         <button type="submit" class="btn my-3" style="background-color:#A4F02A">ดำเนินการ</button>
                     </div>
                 </form>
@@ -143,34 +124,32 @@
             </div>
         </div>
     </div>
+
+
 @endsection
-{{-- 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-    $(document).ready(function() {
-        // ฟังก์ชันตรวจสอบว่า พ.ร.บ. หรือภาษีหมดอายุใน 90 วันหรือไม่
-        function checkExpiration() {
-            let insExpiring = "{{ \Carbon\Carbon::parse($car->next_Ins)->diffInDays(now()) <= 90 }}";
-            let taxExpiring = "{{ \Carbon\Carbon::parse($car->renew)->diffInDays(now()) <= 90 }}";
+@section('scripts')
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            let daysIns = Number("{{ $list->days_ins ?? 0 }}"); // ถ้าเป็น null จะใช้ 0
+            let daysTax = Number("{{ $list->days ?? 0 }}"); // ถ้าเป็น null จะใช้ 0
 
-            // ถ้า พ.ร.บ. หมดอายุภายใน 90 วัน, สามารถติ๊กได้
-            if (insExpiring === "1") {
-                $('#inlineCheckbox1').prop('disabled', false); // ทำให้สามารถติ๊กได้
+            console.log("daysIns:", daysIns, "daysTax:", daysTax);
+
+            let renewPrb = document.querySelector('input[name="renew_prb"]');
+            let renewTax = document.querySelector('input[name="renew_tax"]');
+
+            // ตรวจสอบเงื่อนไขว่าเหลือวันมากกว่า 90 หรือไม่
+            if (renewPrb && daysIns <= 90) {
+                renewPrb.disabled = false; // ถ้าเหลือวันน้อยกว่าหรือเท่ากับ 90 ให้เปิดใช้งาน
             } else {
-                $('#inlineCheckbox1').prop('disabled', true); // ทำให้ไม่สามารถติ๊กได้
+                renewPrb.disabled = true; // ถ้าเหลือวันมากกว่า 90 ให้ปิดใช้งาน
             }
 
-            // ถ้าภาษีหมดอายุภายใน 90 วัน, สามารถติ๊กได้
-            if (taxExpiring === "1") {
-                $('#inlineCheckbox2').prop('disabled', false); // ทำให้สามารถติ๊กได้
+            if (renewTax && daysTax <= 90) {
+                renewTax.disabled = false; // ถ้าเหลือวันน้อยกว่าหรือเท่ากับ 90 ให้เปิดใช้งาน
             } else {
-                $('#inlineCheckbox2').prop('disabled', true); // ทำให้ไม่สามารถติ๊กได้
+                renewTax.disabled = true; // ถ้าเหลือวันมากกว่า 90 ให้ปิดใช้งาน
             }
-        }
-
-        // เรียกฟังก์ชันเมื่อตรวจสอบข้อมูล
-        checkExpiration();
-    });
-</script>
-
-@endsection --}}
+        });
+    </script>
+@endsection
