@@ -50,13 +50,16 @@ Route::post('CheckCosts/{id}/{typeRenew?}', [CalculateController::class, 'CalCos
 Route::get('InsView',[AdminController::class,'InsView']);
 Route::get('/history/{id}',[AdminController::class,'storeHistory'])->name('history');
 Route::get('/ShowHis',[AdminController::class,'showHis']);
+Route::get('/receive',[AdminController::class,'showReceive']);
 Route::get('/sum', [ChartController::class, 'CarChart']);
-
+Route::get('/receive', [AdminController::class, 'showReceive'])->name('receiveStore');
 
 Route::post('/store-history', [AdminController::class, 'storeHistory'])->name('storeHistory');
 Route::post('/update-date-renew', [AdminController::class, 'updateDateRenew'])->name('updateDateRenew');
 
 
+Route::post('/history/update/{id}', [AdminController::class, 'storeHistoryReceive'])->name('history.update');
+// Route::post('/history/update/{id}', [HistoryController::class, 'updateHistory'])->name('history.update');
 // Route::get('/upload/{filename}', function ($filename) {
 //     return response()->file(storage_path('upload\doc' . $filename));
 // });

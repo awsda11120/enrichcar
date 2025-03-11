@@ -12,92 +12,6 @@ use Illuminate\Support\Facades\Log;
 class AdminController extends Controller
 {
     
-
-//     public function updateDateRenew(Request $request)
-// {
-    
-//     try {
-//         $request->validate([
-//             'history_id' => 'required|integer|exists:histories,id',
-//             'date_renew' => 'required|date',
-//         ]);
-
-//         // อัปเดตวันที่และสถานะ
-//         $updated = DB::table('histories')->where('id', $request->history_id)
-//                     ->update([
-//                         'DateRenew' => $request->date_renew,
-//                         'status' => 1 // เปลี่ยนสถานะเป็น "เสร็จสิ้น"
-//                     ]);
-
-//         if ($updated) {
-//             return response()->json(['success' => true, 'message' => 'บันทึกสำเร็จ']);
-//         } else {
-//             return response()->json(['success' => false, 'message' => 'บันทึกไม่สำเร็จ']);
-//         }
-//     } catch (\Exception $e) {
-//         return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
-//     }
-
-// }
-
-// public function updateDateRenew(Request $request)
-// {
-//     try {
-//         $request->validate([
-//             'history_id' => 'required|integer|exists:histories,id',
-//             'date_renew' => 'required|date',
-//         ]);
-
-//         // ดึงข้อมูลจากตาราง histories โดยใช้ history_id
-//         $historyRecord = DB::table('histories')->where('id', $request->history_id)->first();
-
-//         if (!$historyRecord) {
-//             return response()->json(['success' => false, 'message' => 'ไม่พบข้อมูล history']);
-//         }
-
-//         $carId = $historyRecord->CarId;
-
-//         // เช็คว่ามี CarId หรือไม่
-//         if (!$carId) {
-//             return response()->json(['success' => false, 'message' => 'ไม่พบ CarId']);
-//         }
-
-//         // ตรวจสอบค่า TypeRenewIns และ TypeRenewTax
-//         $carUpdateData = [];
-
-//         // ถ้า TypeRenewIns = 1 ให้เพิ่ม InsHistoryDate ใน carUpdateData
-//         if ($historyRecord->TypeRenewIns == 1) {
-//             $carUpdateData['InsHistoryDate'] = $request->date_renew;
-//         }
-
-//         // ถ้า TypeRenewTax = 1 ให้เพิ่ม TaxHistoryDate ใน carUpdateData
-//         if ($historyRecord->TypeRenewTax == 1) {
-//             $carUpdateData['TaxHistoryDate'] = $request->date_renew;
-//         }
-
-//         // ถ้ามีข้อมูลที่จะอัปเดตใน cars
-//         if (!empty($carUpdateData)) {
-//             // อัปเดตตาราง cars
-//             DB::table('cars')->where('id', $carId)->update($carUpdateData);
-//         }
-
-//         // อัปเดตวันที่และสถานะในตาราง histories
-//         DB::table('histories')->where('id', $request->history_id)
-//             ->update([
-//                 'DateRenew' => $request->date_renew,
-//                 'status' => 1 // เปลี่ยนสถานะเป็น "เสร็จสิ้น"
-//             ]);
-
-//         // รีเฟรชข้อมูล
-//         $this->info();
-
-//         return response()->json(['success' => true, 'message' => 'บันทึกสำเร็จ']);
-//     } catch (\Exception $e) {
-//         return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
-//     }
-// }
-
-
 public function updateDateRenew(Request $request)
 {
     try {
@@ -144,12 +58,14 @@ public function updateDateRenew(Request $request)
     } catch (\Exception $e) {
         return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
     }
+    $List =  DB::table('histories as htr')
+                 ->join('cars as c','htr.CarId','=','c.id')
+                 ->join('customers as cs', 'c.CusId', '=', 'cs.id')
+                 ->select('c.CarNumber','cs.CustomerName','cs.PhoneNumber','c.SelectOption','htr.status','htr.Receive','htr.id as history_id','htr.TypeRenewIns','htr.TypeRenewTax','c.id as car_id','htr.DateRenew','c.BookOwner')
+                 ->get();
+
+    return view('receive',['list' => $List]);
 }
-
-
-
-
-
 
 
 public function storeHistory(Request $request)
@@ -205,18 +121,74 @@ public function storeHistory(Request $request)
     return view('history', ['list' => $List]);
 }
 
+public function storeHistoryReceive(Request $request, $id)
+{
+    $data = DB::table('histories as htr')
+        ->join('cars as c','htr.CarId','=','c.id')
+        ->join('customers as cs', 'c.CusId', '=', 'cs.id')
+        ->select('c.CarNumber','cs.CustomerName','cs.PhoneNumber','c.SelectOption','htr.ProofOfReceive','htr.status','htr.Receive','htr.id as history_id','htr.TypeRenewIns','htr.TypeRenewTax','c.id as car_id','htr.DateRenew','c.BookOwner')
+        ->where('htr.id', $id)
+        ->first();
+    
+    // ตรวจสอบว่าข้อมูลมีอยู่หรือไม่
+    if (!$data) {
+        return redirect()->back()->withErrors(['error' => 'ไม่พบข้อมูลที่ต้องการ']);
+    }
+
+    // ตรวจสอบว่ามีการกรอกข้อมูลหรืออัปโหลดไฟล์
+    if ($data->SelectOption == 'จัดส่งตามที่อยู่') {
+        // ตรวจสอบว่าเลขพัสดุถูกกรอกหรือไม่
+        if (!$request->has('ProofOfReceive') || $request->input('ProofOfReceive') == '') {
+            return redirect()->back()->withErrors(['proof_required' => 'กรุณากรอกเลขพัสดุ']);
+        }
+        // เก็บเลขพัสดุ
+        DB::table('histories')->where('id', $id)->update([
+            'ProofOfReceive' => $request->input('ProofOfReceive')
+        ]);
+    } elseif ($data->SelectOption == 'มารับเอง') {
+        // ตรวจสอบว่าอัปโหลดไฟล์หรือไม่
+        if (!$request->hasFile('ProofOfReceive')) {
+            return redirect()->back()->withErrors(['proof_required' => 'กรุณาอัปโหลดไฟล์']);
+        }
+
+        // อัปโหลดไฟล์
+        $file = $request->file('ProofOfReceive');
+        $fileName = time() . '.' . $file->getClientOriginalExtension();
+        $file->storeAs('public/proofs', $fileName);
+
+        // เก็บชื่อไฟล์ในฐานข้อมูล
+        DB::table('histories')->where('id', $id)->update([
+            'ProofOfReceive' => $fileName
+        ]);
+    }
+
+    // รีไดเร็กต์กลับไปยังหน้าและแสดงข้อความสำเร็จ
+    return redirect()->route('receiveStore')->with('success', 'ข้อมูลได้รับการบันทึกเรียบร้อยแล้ว');
+}
+
 
 
     function showHis()
     {
         $List =  DB::table('histories as htr')
                  ->join('cars as c','htr.CarId','=','c.id')
-                 ->select('c.CarNumber','htr.status','htr.Receive','htr.id as history_id','htr.TypeRenewIns','htr.TypeRenewTax','c.id as car_id','htr.DateRenew','c.BookOwner')
+                 ->select('c.CarNumber','htr.status','htr.Receive','htr.ProofOfReceive','htr.id as history_id','htr.TypeRenewIns','htr.TypeRenewTax','c.id as car_id','htr.DateRenew','c.BookOwner')
                  ->get();
     // $cID = $List->id;
         // $his_id = $List->id;
 
         return view('history',['list' => $List]);
+    }
+
+    function showReceive()
+    {
+        $List =  DB::table('histories as htr')
+                 ->join('cars as c','htr.CarId','=','c.id')
+                 ->join('customers as cs', 'c.CusId', '=', 'cs.id')
+                 ->select('c.CarNumber','cs.CustomerName','cs.PhoneNumber','htr.ProofOfReceive','c.SelectOption','htr.status','htr.Receive','htr.id as history_id','htr.TypeRenewIns','htr.TypeRenewTax','c.id as car_id','htr.DateRenew','c.BookOwner')
+                 ->get();
+
+        return view('receive',['list' => $List]);
     }
 
 
@@ -377,77 +349,7 @@ public function storeHistory(Request $request)
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
-    // function info(){
-    //     $List =  DB::table('cars as c')
-    //              ->join('customers as cs','c.CusId','=','cs.id')
-    //              ->select('c.CarNumber','c.TaxHistoryDate','c.RegistrationDate','c.InsHistoryDate','cs.CustomerName','cs.PhoneNumber','cs.id','c.BookOwner','c.id')
-    //              ->get();
-
-    //     // calculate to renew ins
-    //     foreach ($List as $index => $item) {
-    //         $d_warning = 90;
-    //         $d_danger = 30;
-    //         $d_expire = 0;
-    //         // $ins_warning = 90;
-    //         // $ins_danger = 30;
-
-
-    //         $today = date_create(date('Y-m-d')); // วันที่ปัจจุบัน
-
-    //         // แยกวัน, เดือน, ปี จาก RegistrationDate
-    //         $regArr = explode("-", $item->RegistrationDate);
-    //         $regDay = $regArr[2];  // วัน
-    //         $regMonth = $regArr[1]; // เดือน
-    //         $regYear = $regArr[0]; // ปี
     
-    //         // ใช้ TaxHistoryDate เป็นฐานในการคำนวณปี
-    //         $taxExpireDate = date_create($item->TaxHistoryDate); // วันต่อภาษีครั้งล่าสุด
-    //         $taxExpireDate->modify('+1 year'); // เพิ่ม 1 ปีจากวันต่อภาษี
-    
-    //         // ใช้ปีจาก TaxHistoryDate แต่ใช้วันเดือนจาก RegistrationDate
-    //         $taxExpireDate->setDate($taxExpireDate->format('Y'), $regMonth, $regDay); // เปลี่ยนปีจาก TaxHistoryDate และใช้เดือน/วันจาก RegistrationDate
-    
-    //         // เก็บวันที่หมดอายุภาษี
-    //         $List[$index]->tax_expiry_date = $taxExpireDate->format('d/m/Y'); // วันหมดอายุภาษีในรูปแบบ วัน/เดือน/ปี
-    
-    //         // คำนวณจำนวนวันที่เหลือจนถึงวันหมดอายุภาษี
-    //         $diff = date_diff($today, $taxExpireDate); // ความต่างระหว่างวันที่ปัจจุบันและวันหมดอายุภาษี
-    //         $days_left = (int)$diff->format('%a'); // จำนวนวันเหลือจนถึงวันหมดอายุภาษี
-    
-    //         // เก็บจำนวนวันที่เหลือ
-    //         $List[$index]->tax_days_left = $days_left;
-
-    //         //calculate days to renew from today
-    //         // $date_renew =  date_create(date('Y-m-d',strtotime(implode("-",$regArr))));
-    //         // $due_date_diff = date_diff($today,$date_renew);
-    //         // $days = (int)$due_date_diff->format('%a')%365;
-
-    //         // $List[$index]->days = $days;
-    //         // $List[$index]->cls = ($days<=$d_danger) ? "bg_danger" : (($days>$d_danger&&$days<=$d_warning) ? "bg_warning" : "") ;
-    //         // $List[$index]->disabled = ($days<=$d_danger) ? "" : "disabled" ;
-    //         $date = (date('Y-m-d',strtotime($item->InsHistoryDate))); // Replace with your date
-    //         $newDate = date('d/m/Y', strtotime('+365 days', strtotime($date)));
-    //         $List[$index]->next_Ins = $newDate;
-    //         $ins = date('Y-m-d',strtotime('+365 days', strtotime($date)));
-    //         $ins = date_create($ins);
-    //         $diff_ins = date_diff($today,$ins);
-    //         $days_ins = (int)$diff_ins->format('%a')%365;
-
-    //         $register_day = date_create(date('Y-m-d',strtotime($item->RegistrationDate)));
-    //         // $today = date_create(date('Y-m-d'));
-    //         $diff_register = date_diff($register_day,$today);
-    //         $days = (int)$diff_register->format('%a')%365;     // เศษวัน
-    //         $total_year = floor((int)$diff_register->format('%a')/365);
-            
-    //     }
-    //     return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
-
-    //     session(['total_year' => $total_year]);
-    //     return view('info',["list"=>$List]);
-
-    // }
-    
-
 
     function sum()
     {
