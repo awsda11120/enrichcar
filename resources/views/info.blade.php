@@ -91,11 +91,33 @@
                     <td>{{ $item->CarNumber }}</td>
                     <td>{{ $item->CustomerName }}</td>
                     <td>{{ $item->PhoneNumber }}</td>
-                    <td >
+                    <td>
                         {{ $item->next_Ins }}
+                        <span class="dot" style="background-color: 
+                            @if ($item->ins_days_left <= 0)
+                                gray;
+                            @elseif ($item->ins_days_left >= 1 && $item->ins_days_left <= 30)
+                                red;
+                            @elseif ($item->ins_days_left > 30 && $item->ins_days_left <= 90)
+                                #ffe600;
+                            @else
+                                #51c556; /* สีเขียวสว่าง */
+                            @endif
+                        "></span>
                     </td>
-                    <td >
+                    <td>
                         {{ $item->tax_expiry_date }}
+                        <span class="dot" style="background-color: 
+                            @if ($item->tax_days_left <= 0)
+                                gray;
+                            @elseif ($item->tax_days_left >= 1 && $item->tax_days_left <= 30)
+                                red;
+                            @elseif ($item->tax_days_left > 30 && $item->tax_days_left <= 90)
+                                #ffe600;
+                            @else
+                                #51c556; สีเขียวสว่าง
+                            @endif
+                        "></span>
                     </td>
                     <td>
                         <a href="{{ route('infomation', $item->id) }}" class="btn btn-light btn-sm"

@@ -306,8 +306,17 @@ public function storeHistoryReceive(Request $request, $id)
                 $List[$index]->tax_expiry_date = $taxExpireDate->format('d/m/Y'); // วันหมดอายุภาษีในรูปแบบ วัน/เดือน/ปี
         
                 // คำนวณจำนวนวันที่เหลือจนถึงวันหมดอายุภาษี
-                $diff = date_diff($today, $taxExpireDate); // ความต่างระหว่างวันที่ปัจจุบันและวันหมดอายุภาษี
-                $days_left = (int)$diff->format('%a'); // จำนวนวันเหลือจนถึงวันหมดอายุภาษี
+                $diff_tax = date_diff($today, $taxExpireDate); // ความต่างระหว่างวันที่ปัจจุบันและวันหมดอายุภาษี
+                $days_left = (int)$diff_tax->format('%a'); // จำนวนวันเหลือจนถึงวันหมดอายุภาษี
+                
+                // ตรวจสอบว่า $taxExpireDate อยู่ในอดีตหรือไม่
+                if ($taxExpireDate < $today) {
+                    // ถ้า $taxExpireDate เก่ากว่า $today ให้ผลลัพธ์เป็นค่าลบ
+                    $days_left = -(int)$diff_tax->format('%a') ;
+                } else {
+                    // ถ้า $taxExpireDate อยู่ในอนาคตหรือวันนี้
+                    $days_left = (int)$diff_tax->format('%a') ;
+                }
         
                 // เก็บจำนวนวันที่เหลือ
                 $List[$index]->tax_days_left = $days_left;
@@ -327,17 +336,42 @@ public function storeHistoryReceive(Request $request, $id)
                 $ins = date_create($ins);
                 $diff_ins = date_diff($today,$ins);
                 $days_ins = (int)$diff_ins->format('%a')%365;
+
+                if ($ins < $today) {
+                    // ถ้า $ins เก่ากว่า $today ให้ผลลัพธ์เป็นค่าลบ
+                    $days_left_ins = -(int)$diff_ins->format('%a') % 365;
+                } else {
+                    // ถ้า $ins อยู่ในอนาคตหรือวันนี้
+                    $days_left_ins = (int)$diff_ins->format('%a') % 365;
+                }
+
+                $List[$index]->ins_days_left = $days_left_ins;
     
                 $register_day = date_create(date('Y-m-d',strtotime($item->RegistrationDate)));
                 // $today = date_create(date('Y-m-d'));
                 $diff_register = date_diff($register_day,$today);
                 $days = (int)$diff_register->format('%a')%365;     // เศษวัน
+
+                
                 $total_year = floor((int)$diff_register->format('%a')/365);
+
+                
 
                 // $List[$index]->days = $days;
                 // $List[$index]->days_ins = $days_ins;
+                // if ($item->tax_days_left < 0) {
+                //     $List[$index]->tax_class = 'expired'; // สีเทา
+                // } elseif ($item->tax_days_left <= 30) {
+                //     $List[$index]->tax_class = 'urgent'; // สีแดง
+                // } elseif ($item->tax_days_left <= 90) {
+                //     $List[$index]->tax_class = 'warning'; // สีเหลือง
+                // } else {
+                //     // กรณีที่ไม่ได้อยู่ในเงื่อนไขที่กำหนด
+                //     $List[$index]->tax_class = 'default'; // ตั้งค่าเป็น default หรือค่าสีอื่น ๆ
+                // }
                 
             }
+            
     
             session(['total_year' => $total_year]);
     

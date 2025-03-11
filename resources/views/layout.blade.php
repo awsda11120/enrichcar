@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">
     <script src="//code.jquery.com/jquery-1.10.2.js"></script>
     <script src="//code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
-    
+
     {{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> --}}
 
 
@@ -107,7 +107,7 @@
             font-weight: 400;
         }
 
-        #editInfo label { 
+        #editInfo label {
             margin-top: 20px;
             font-size: 14px;
             color: #666;
@@ -162,23 +162,36 @@
 
 
         /* end add info form */
-        .errMsg ul li{
+        .errMsg ul li {
             list-style: none;
-            color:#EC0000;
+            color: #EC0000;
         }
+
         .bg_danger td {
-            background:#f87979!important;
-            color:##000;
+            background: #f87979 !important;
+            color: ##000;
         }
 
         .bg_warning td {
-            background:#FFFF99!important;
-            color:#000;
+            background: #FFFF99 !important;
+            color: #000;
         }
-        .bg_expire td{
-            background:#D3D3D3!important;
-            color:#000;
+
+        .bg_expire td {
+            background: #D3D3D3 !important;
+            color: #000;
         }
+
+        .dot {
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            margin-left: 5px;
+        }
+
+
+
         /*
         .exp {
             background-color: gray !important;

@@ -42,6 +42,9 @@ class CalculateController extends Controller
     $sum_tax = 0;
     $original_tax = 0; // เก็บค่าภาษีก่อนลด
 
+    $discountPercent = 0;
+    $discountAmount = 0;
+
     if ($calculateTax) {
         if ($tax == 1) { // คำนวณภาษีจาก CC
             if ($cc >= 1801) {
@@ -71,10 +74,7 @@ class CalculateController extends Controller
             $discountPercent = min(($carYears - 5) * 10, 50); // จำกัดส่วนลดสูงสุดที่ 50%
             $discountAmount = $sum_tax * ($discountPercent / 100);
             $sum_tax -= $discountAmount;
-        } else {
-            $discountPercent = 0;
-            $discountAmount = 0;
-        }
+        } 
     }
 
         // คำนวณค่าพ.ร.บ. ถ้ามีการเลือก
