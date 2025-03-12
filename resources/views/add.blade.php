@@ -51,7 +51,7 @@
                             @enderror
                         </div>
                         <div class="col-md-8">
-                            <label for="Address" class="form-label">ที่อยู่ปัจจุบัน</label>
+                            <label for="Address" class="form-label">ที่อยู่จัดส่ง</label>
                             <input type="text" class="form-control" name="Address">
                             @error('Address')
                                 <div class="my-1">
@@ -120,7 +120,7 @@
                                     </div>
                                 @enderror
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-4">
                                 <label for="InsuranceType" class="form-label">ประเภท พ.ร.บ.</label>
                                 <select name="InsuranceType" class="form-select">
                                     <option selected>เลือก...</option>
@@ -134,7 +134,7 @@
                                     </div>
                                 @enderror
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-5">
                                 <label for="TaxType" class="form-label">ประเภทภาษี</label>
                                 <select name="TaxType" class="form-select">
                                     <option selected>เลือก...</option>
@@ -149,7 +149,7 @@
                                 @enderror
                             </div>
 
-                            
+
                             {{-- <div class="col-md-3">
                                 <label for="CarBrand" class="form-label">ยี่ห้อ</label>
                                 <select name="CarBrand" class="form-select">

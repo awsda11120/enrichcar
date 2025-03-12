@@ -1,11 +1,12 @@
 @extends('layout')
-@section('doc', 'Add')
+@section('doc', 'Edit')
 @section('content')
     <h3 class="text-center">
         แก้ไขข้อมูล
     </h3>
     <div class="container py-4 ">
-        <form method="POST" action="{{ route('updateInfo', $car->id, $customer->id) }}">
+        {{-- <form method="POST" action="{{route('updateInfo', $car->id, $customer->id,$List->id) }}" id="editInfo" enctype="multipart/form-data" > --}}
+            <form method="POST" action="{{route('updateInfo', $car->id, $customer->id) }}" id="editInfo" enctype="multipart/form-data" >
             @csrf
             <div class="row ms-auto justify-content-center">
                 <div class="col-md-9">
@@ -27,16 +28,6 @@
                             <label for="NationalID" class="form-label">เลขบัตรประชาชน</label>
                             <input type="text" class="form-control" name="NationalID" class="form-control"
                                 value="{{ $customer->NationalID }}">
-
-                            {{--
-                            <input type="checkbox" name="NationalID"> sdadasd
-
-                            <label for="A1">
-                                <input type="radio" id="A1" value="AAA" name="NationalIDx"> AAAA
-                            </label>
-                            <input type="radio"  value="BBB" name="NationalIDx"> BB --}}
-
-
                             @error('NationalID')
                                 <div class="my-1">
                                     <span class="text-danger">{{ $message }}</span>
@@ -54,7 +45,7 @@
                             @enderror
                         </div>
                         <div class="col-md-8">
-                            <label for="Address" class="form-label">ที่อยู่ปัจจุบัน</label>
+                            <label for="Address" class="form-label">ที่อยู่จัดส่ง</label>
                             <input type="text" class="form-control" name="Address" class="form-control"
                                 value="{{ $customer->Address }}">
                             @error('Address')
@@ -87,7 +78,7 @@
                             <div class="col-md-3">
                                 <label for="CarCity" class="form-label">จังหวัด</label>
                                 <select name="CarCity" class="form-select">
-                                    <option selected>เลือก...</option>
+                                    <option selected>{{ $car->CarCity}} </option>
                                     @foreach ($prov as $item)
                                         <option value="{{ $item->name }}"> {{ $item->name }}</option>
                                     @endforeach
@@ -128,15 +119,29 @@
                                     </div>
                                 @enderror
                             </div>
-                            <div class="col-md-3">
-                                <label for="CarType" class="form-label">ประเภท</label>
-                                <select name="CarType" class="form-select">
-                                    <option selected>เลือก...</option>
-                                    @foreach ($sett['type'] as $item)
-                                        <option value="{{ $item->name }}"> {{ $item->name }}</option>
+                            <div class="col-md-4">
+                                <label for="InsuranceType" class="form-label">ประเภท พ.ร.บ.</label>
+                                <select name="InsuranceType" class="form-select">
+                                    <option selected> {{ $car->InsuranceType }}</option>
+                                    @foreach ($sett["type"] as $item )
+                                        <option value="{{$item->name}}"> {{$item->name}}</option>
                                     @endforeach
                                 </select>
-                                @error('CarType')
+                                @error('InsuranceType')
+                                    <div class="my-1">
+                                        <span class="text-danger">{{ $message }}</span>
+                                    </div>
+                                @enderror
+                            </div>
+                            <div class="col-md-5">
+                                <label for="TaxType" class="form-label">ประเภทภาษี</label>
+                                <select name="TaxType" class="form-select">
+                                    <option selected>{{ $car->TaxType }}</option>
+                                    @foreach ($tax as $item )
+                                        <option value="{{$item->name}}"> {{$item->name}}</option>
+                                    @endforeach
+                                </select>
+                                @error('TaxType')
                                     <div class="my-1">
                                         <span class="text-danger">{{ $message }}</span>
                                     </div>
@@ -165,22 +170,26 @@
                             </div>
                             <div class="col-md-2">
                                 <label for="SelectOption" class="form-label">การรับเอกสาร</label>
-                                <input type="text" class="form-control" name="SelectOption">
+                                <select name="SelectOption" class="form-select">
+                                    <option selected>{{ $car->SelectOption }} </option>
+                                        <option>มารับเอง</option>
+                                        <option>จัดส่งตามที่อยู่</option>
+                                </select>
+                                {{-- <label for="SelectOption" class="form-label">การรับเอกสาร</label>
+                                <input type="text" class="form-control" name="SelectOption">--}}
                                 @error('SelectOption')
                                     <div class="my-1">
                                         <span class="text-danger">{{ $message }}</span>
                                     </div>
                                 @enderror
                             </div>
-
                             <div class="col-md-12">
                                 <label for="singleFile" class="form-label">สำเนาเล่มทะเบียน</label>
-                                <input type="file" class="form-control" name="singleFile"  >
+                                <input type="file" class="form-control" name="singleFile"
+                                value="{{ $car->BookOwner }}">
                             </div>
                         </div>
                     </div>
-
-
                 </div>
                 <div class="errMsg">
                     <ul>
@@ -191,7 +200,7 @@
                 </div>
                 <div class="container col-2 mx-auto">
                     <input type="submit" value="บันทึก" class="btn my-3" style="background-color:#A4F02A">
-                    <a href="/" class="btn btn-warning my-3" style="background-color:#F0DF2A">กลับ</a>
+                    <a href="{{route('infomation',$car->id,$customer->id)}}" class="btn my-3" style="background-color:#f87979">ยกเลิก</a>
                 </div>
             </div>
         </form>
