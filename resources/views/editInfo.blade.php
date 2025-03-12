@@ -5,8 +5,12 @@
         แก้ไขข้อมูล
     </h3>
     <div class="container py-4 ">
+<<<<<<< HEAD
         {{-- <form method="POST" action="{{route('updateInfo', $car->id, $customer->id,$List->id) }}" id="editInfo" enctype="multipart/form-data" > --}}
             <form method="POST" action="{{route('updateInfo', $car->id, $customer->id) }}" id="editInfo" enctype="multipart/form-data" >
+=======
+        <form method="POST" action="{{ route('updateInfo', ['id' => $list->id]) }}" id="editInfo" enctype="multipart/form-data">
+>>>>>>> fa5eb14c5b8246d716d8bddf41faf7133399fc89
             @csrf
             <div class="row ms-auto justify-content-center">
                 <div class="col-md-9">
@@ -17,7 +21,7 @@
                         <div class="col-md-6 ">
                             <label for="CustomerName" class="form-label">ชื่อและนามสกุล</label>
                             <input type="text" class="form-control" name="CustomerName" class="form-control"
-                                value="{{ $customer->CustomerName }}">
+                                value="{{ $list->CustomerName }}">
                             @error('CustomerName')
                                 <div class="my-1">
                                     <span class="text-danger">{{ $message }}</span>
@@ -27,7 +31,21 @@
                         <div class="col-md-6">
                             <label for="NationalID" class="form-label">เลขบัตรประชาชน</label>
                             <input type="text" class="form-control" name="NationalID" class="form-control"
+<<<<<<< HEAD
                                 value="{{ $customer->NationalID }}">
+=======
+                                value="{{ $list->NationalID }}">
+
+                            {{--
+                            <input type="checkbox" name="NationalID"> sdadasd
+
+                            <label for="A1">
+                                <input type="radio" id="A1" value="AAA" name="NationalIDx"> AAAA
+                            </label>
+                            <input type="radio"  value="BBB" name="NationalIDx"> BB --}}
+
+
+>>>>>>> fa5eb14c5b8246d716d8bddf41faf7133399fc89
                             @error('NationalID')
                                 <div class="my-1">
                                     <span class="text-danger">{{ $message }}</span>
@@ -37,7 +55,7 @@
                         <div class="col-md-4">
                             <label for="PhoneNumber" class="form-label">เบอร์โทร</label>
                             <input type="number" class="form-control" name="PhoneNumber" class="form-control"
-                                value="{{ $customer->PhoneNumber }}">
+                                value="{{ $list->PhoneNumber }}">
                             @error('PhoneNumber')
                                 <div class="my-1">
                                     <span class="text-danger">{{ $message }}</span>
@@ -47,7 +65,7 @@
                         <div class="col-md-8">
                             <label for="Address" class="form-label">ที่อยู่จัดส่ง</label>
                             <input type="text" class="form-control" name="Address" class="form-control"
-                                value="{{ $customer->Address }}">
+                                value="{{ $list->Address }}">
                             @error('Address')
                                 <div class="my-1">
                                     <span class="text-danger">{{ $message }}</span>
@@ -68,7 +86,7 @@
                             <div class="col-md-3">
                                 <label for="CarNumber" class="form-label">เลขทะเบียน</label>
                                 <input type="text" class="form-control" name="CarNumber" class="form-control"
-                                    value="{{ $car->CarNumber }}">
+                                    value="{{ $list->CarNumber }}">
                                 @error('CarNumber')
                                     <div class="my-1">
                                         <span class="text-danger">{{ $message }}</span>
@@ -78,9 +96,13 @@
                             <div class="col-md-3">
                                 <label for="CarCity" class="form-label">จังหวัด</label>
                                 <select name="CarCity" class="form-select">
+<<<<<<< HEAD
                                     <option selected>{{ $car->CarCity}} </option>
+=======
+                                    <option selected>{{ $list->CarCity }}</option>
+>>>>>>> fa5eb14c5b8246d716d8bddf41faf7133399fc89
                                     @foreach ($prov as $item)
-                                        <option value="{{ $item->name }}"> {{ $item->name }}</option>
+                                        <option> {{ $item->name }}</option>
                                     @endforeach
                                 </select>
                                 @error('CarCity')
@@ -92,7 +114,7 @@
                             <div class="col-md-3">
                                 <label for="RegistrationDate" class="form-label">วันที่จดทะเบียน</label>
                                 <input type="text" class="form-control datepicker" name="RegistrationDate" readonly
-                                    class="form-control" value="{{ $car->RegistrationDate }}">
+                                    class="form-control" value="{{ $list->RegistrationDate }}">
                                 @error('RegistrationDate')
                                     <div class="my-1">
                                         <span class="text-danger">{{ $message }}</span>
@@ -102,7 +124,7 @@
                             <div class="col-md-3">
                                 <label for="TaxHistoryDate" class="form-label">วันที่ต่อภาษีครั้งล่าสุด</label>
                                 <input type="text" class="form-control datepicker" name="TaxHistoryDate" readonly
-                                    class="form-control" value="{{ $car->TaxHistoryDate }}">
+                                    class="form-control" value="{{ $list->TaxHistoryDate }}">
                                 @error('TaxHistoryDate')
                                     <div class="my-1">
                                         <span class="text-danger">{{ $message }}</span>
@@ -112,7 +134,7 @@
                             <div class="col-md-3">
                                 <label for="InsHistoryDate" class="form-label">วันที่ต่อ พ.ร.บ. ครั้งล่าสุด</label>
                                 <input type="text" class="form-control datepicker" name="InsHistoryDate" readonly
-                                    class="form-control" value="{{ $car->InsHistoryDate }}">
+                                    class="form-control" value="{{ $list->InsHistoryDate }}">
                                 @error('InsHistoryDate')
                                     <div class="my-1">
                                         <span class="text-danger">{{ $message }}</span>
@@ -122,9 +144,15 @@
                             <div class="col-md-4">
                                 <label for="InsuranceType" class="form-label">ประเภท พ.ร.บ.</label>
                                 <select name="InsuranceType" class="form-select">
+<<<<<<< HEAD
                                     <option selected> {{ $car->InsuranceType }}</option>
                                     @foreach ($sett["type"] as $item )
                                         <option value="{{$item->name}}"> {{$item->name}}</option>
+=======
+                                    <option selected>{{ $list->InsuranceType }}</option>
+                                    @foreach ($sett['type'] as $item)
+                                        <option> {{ $item->name }}</option>
+>>>>>>> fa5eb14c5b8246d716d8bddf41faf7133399fc89
                                     @endforeach
                                 </select>
                                 @error('InsuranceType')
@@ -136,9 +164,15 @@
                             <div class="col-md-5">
                                 <label for="TaxType" class="form-label">ประเภทภาษี</label>
                                 <select name="TaxType" class="form-select">
+<<<<<<< HEAD
                                     <option selected>{{ $car->TaxType }}</option>
                                     @foreach ($tax as $item )
                                         <option value="{{$item->name}}"> {{$item->name}}</option>
+=======
+                                    <option selected>{{ $list->TaxType }}</option>
+                                    @foreach ($taxes as $item)
+                                        <option> {{ $item->name }}</option>
+>>>>>>> fa5eb14c5b8246d716d8bddf41faf7133399fc89
                                     @endforeach
                                 </select>
                                 @error('TaxType')
@@ -151,7 +185,7 @@
                             <div class="col-md-2">
                                 <label for="CarCC" class="form-label">ขนาดกำลัง(CC)</label>
                                 <input type="text" class="form-control" name="CarCC" class="form-control"
-                                    value="{{ $car->CarCC }}">
+                                    value="{{ $list->CarCC }}">
                                 @error('CarCC')
                                     <div class="my-1">
                                         <span class="text-danger">{{ $message }}</span>
@@ -161,7 +195,7 @@
                             <div class="col-md-2">
                                 <label for="CarWeight" class="form-label">น้ำหนัก(ก.ก.)</label>
                                 <input type="text" class="form-control" name="CarWeight" class="form-control"
-                                    value="{{ $car->CarWeight }}">
+                                    value="{{ $list->CarWeight }}">
                                 @error('CarWeight')
                                     <div class="my-1">
                                         <span class="text-danger">{{ $message }}</span>
@@ -171,12 +205,19 @@
                             <div class="col-md-2">
                                 <label for="SelectOption" class="form-label">การรับเอกสาร</label>
                                 <select name="SelectOption" class="form-select">
+<<<<<<< HEAD
                                     <option selected>{{ $car->SelectOption }} </option>
                                         <option>มารับเอง</option>
                                         <option>จัดส่งตามที่อยู่</option>
                                 </select>
                                 {{-- <label for="SelectOption" class="form-label">การรับเอกสาร</label>
                                 <input type="text" class="form-control" name="SelectOption">--}}
+=======
+                                    <option selected>{{ $list->SelectOption }}</option>
+                                    <option>มารับเอง</option>
+                                    <option>จัดส่งตามที่อยู่</option>
+                                </select>
+>>>>>>> fa5eb14c5b8246d716d8bddf41faf7133399fc89
                                 @error('SelectOption')
                                     <div class="my-1">
                                         <span class="text-danger">{{ $message }}</span>
@@ -185,8 +226,16 @@
                             </div>
                             <div class="col-md-12">
                                 <label for="singleFile" class="form-label">สำเนาเล่มทะเบียน</label>
+<<<<<<< HEAD
                                 <input type="file" class="form-control" name="singleFile"
                                 value="{{ $car->BookOwner }}">
+=======
+                                @if (!empty($list->BookOwner))
+                                    <input type="text" class="form-control"
+                                        value="/upload/doc/{{ $list->BookOwner }}" readonly>
+                                @endif
+                                <input type="file" class="form-control" name="singleFile">
+>>>>>>> fa5eb14c5b8246d716d8bddf41faf7133399fc89
                             </div>
                         </div>
                     </div>

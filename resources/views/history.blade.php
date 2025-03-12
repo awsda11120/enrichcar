@@ -14,7 +14,7 @@
 
     </div>
     <hr>
-    <table class="table  table-grid">
+    <table class="table table-grid">
         <thead class="text-center">
             <tr>
                 <th scope="col">วันที่ดำเนินการต่อ</th>
@@ -32,7 +32,7 @@
                 <tr>
                     <td>
                         <input type="text" class="form-control datepicker col-md-2 date-renew-input"
-                            data-id="{{ $item->id }}" value="{{ $item->DateRenew }}" readonly>
+                            data-id="{{ $item->history_id }}" value="{{ $item->DateRenew }}" readonly>
                     </td>
                     <td>{{ $item->CarNumber }}</td>
                     <td>
@@ -50,17 +50,27 @@
                         @endif
                     </td>
                     <td>{{ $item->Receive }}</td>
-                    <td>{{ $item->id }}</td>
+                    <td>
+                        @if (!empty($item->BookOwner))
+                            <a href="{{ asset('upload\doc/' . $item->BookOwner) }}" download class="btn btn-sm"
+                                style="background-color: #A2D7FF;">
+                                ดาวน์โหลด
+                            </a>
+                        @else
+                            <span class="text-muted">ไม่มีไฟล์</span>
+                        @endif
+                    </td>
                     <td style="background:#FFF!important;">
-                        <button class="btn btn-light btn-sm complete-btn" data-id="{{ $item->id }}"
+                        <button class="btn btn-light btn-sm complete-btn" data-id="{{ $item->history_id }}"
                             style="background-color: {{ $item->status == 1 ? '#ccc' : '#A4F02A' }}"
                             {{ $item->status == 1 ? 'disabled' : '' }}>
-                            {{ $item->status == 1 ? 'เสร็จสิ้นแล้ว' : 'เสร็จสิ้น' }}
+                            {{ $item->status == 1 ? 'เสร็จสิ้น' : 'เสร็จสิ้น' }}
                         </button>
+
                     </td>
                     <td>
                         <!-- เพิ่มปุ่ม "แก้ไข" -->
-                        <button class="btn btn-warning btn-sm edit-btn" data-id="{{ $item->id }}"
+                        <button class="btn btn-warning btn-sm edit-btn" data-id="{{ $item->history_id }}"
                             data-date="{{ $item->DateRenew }}">
                             แก้ไข
                         </button>
@@ -80,7 +90,7 @@
 
             // คลิกปุ่ม "แก้ไข"
             $('.edit-btn').click(function() {
-                let historyId = $(this).data('id');
+                let historyId = $(this).data('id'); // ดึงค่า id ที่เป็น history_id
                 let dateRenew = $(this).data('date');
                 let row = $(this).closest('tr');
 
@@ -89,44 +99,47 @@
                 dateInput.removeAttr('readonly');
                 dateInput.val(dateRenew); // กำหนดวันที่เดิมให้แสดงในช่อง
 
-                // เปลี่ยนสีของปุ่ม "เสร็จสิ้น" เป็นสีเขียว
-                row.find('.complete-btn').css("background-color", "#A4F02A").prop("disabled", false);
+                // เปลี่ยนสีของปุ่ม "เสร็จสิ้น" เป็นสีเขียว และเปิดให้คลิกได้
+                row.find('.complete-btn').css({
+                    "background-color": "#A4F02A",
+                    "cursor": "pointer"
+                }).prop("disabled", false);
             });
 
             // คลิกปุ่ม "เสร็จสิ้น"
             $('.complete-btn').click(function() {
-                let historyId = $(this).data('id');
+                let historyId = $(this).data('id'); // ใช้ data-id เพื่อรับค่า history_id จากปุ่ม
                 let dateRenew = $(this).closest('tr').find('.date-renew-input').val();
                 let button = $(this);
 
-                // ตรวจสอบว่าได้เลือกวันที่หรือไม่
-                if (!dateRenew) {
-                    alert('กรุณาเลือกวันที่ก่อนกดปุ่มเสร็จสิ้น');
+                // ตรวจสอบค่าก่อนส่ง
+                if (!historyId || !dateRenew) {
+                    alert('กรุณากรอกข้อมูลให้ครบ');
                     return;
                 }
 
                 $.ajax({
-                    url: "{{ route('updateDateRenew') }}",
+                    url: "{{ route('updateDateRenew') }}", // ใช้ route ที่เหมาะสม
                     type: "POST",
                     data: {
-                        _token: "{{ csrf_token() }}",
-                        history_id: historyId,
-                        date_renew: dateRenew
+                        _token: "{{ csrf_token() }}", // ส่ง CSRF Token
+                        history_id: historyId, // ส่ง history_id ที่ถูกต้อง
+                        date_renew: dateRenew // ส่งค่า date_renew ที่เลือกจากช่อง input
                     },
                     success: function(response) {
                         if (response.success) {
-                            // เปลี่ยนปุ่ม "เสร็จสิ้น" เป็นสีทึบ (#ccc) และไม่ให้คลิกได้
                             button.css({
                                 "background-color": "#ccc",
                                 "cursor": "not-allowed"
-                            }).prop("disabled", true).text("เสร็จสิ้นแล้ว");
+                            }).prop("disabled", true).text("เสร็จสิ้น");
 
                             alert('วันที่ถูกบันทึกเรียบร้อยแล้ว');
                         } else {
-                            alert("เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง");
+                            alert(response.message || "เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง");
                         }
                     },
-                    error: function() {
+                    error: function(xhr, status, error) {
+                        console.error(xhr.responseText);
                         alert("เกิดข้อผิดพลาดในการส่งข้อมูลไปยังเซิร์ฟเวอร์");
                     }
                 });
@@ -142,5 +155,4 @@
             });
         });
     </script>
-
 @endsection

@@ -59,34 +59,50 @@
         </thead>
         <tbody class="text-center">
             @foreach ($list as $item)
-            @php
-                $insDaysLeft = (strtotime($item->next_Ins) - time()) / (60 * 60 * 24);
-                $taxDaysLeft = (strtotime($item->renew) - time()) / (60 * 60 * 24);
+                {{-- @php
+                    // คำนวณจำนวนวันคงเหลือ
+                    $insDaysLeft = (strtotime($item->next_Ins) - time()) / (60 * 60 * 24);
+                    $taxDaysLeft = (strtotime($item->renew) - time()) / (60 * 60 * 24);
 
-                // function getBgColor($daysLeft) {
-                //     if ($daysLeft < 0) {
-                //         return 'background-color: #D3D3D3 !important;'; // สีเทา: หมดอายุแล้ว
-                //     } elseif ($daysLeft <= 30) {
-                //         return 'background-color: #FFCCCC !important;'; // สีแดง: ใกล้หมดอายุใน 30 วัน
-                //     } elseif ($daysLeft <= 90) {
-                //         return 'background-color: #FFFF99 !important;'; // สีเหลือง: ใกล้หมดอายุใน 90 วัน
-                //     }
-                //     return ''; // ไม่มีสี
-                // }
-            @endphp
+                    // กำหนดค่าเริ่มต้น
+                    $insColor = '';
+                    $taxColor = '';
 
-            <tr class="{{ $item->cls }}">
-                <td style="background:#FFF!important;">{{ $item->CarNumber }}</td>
-                <td style="background:#FFF!important;">{{ $item->CustomerName }}</td>
-                <td style="background:#FFF!important;">{{ $item->PhoneNumber }}</td>
-                <td>{{ $item->next_Ins }}</td>
-                <td>{{ $item->renew }}</td>
-                <td style="background:#FFF!important;">
-                    <a href="{{ route('infomation', $item->id) }}" class="btn btn-light btn-sm"
-                        style="background-color:#A4F02A">ดำเนินการต่อ</a>
-                </td>
-            </tr>
-        @endforeach
+                    // เงื่อนไขการกำหนดสี พ.ร.บ.
+                    if ($insDaysLeft < 0) {
+                        $insColor = 'background-color: #D3D3D3 !important;'; // สีเทา
+                    } elseif ($insDaysLeft <= 30) {
+                        $insColor = 'background-color: #FFCCCC !important;'; // สีแดง
+                    } elseif ($insDaysLeft <= 90) {
+                        $insColor = 'background-color: #FFFF99 !important;'; // สีเหลือง
+                    }
+
+                    // เงื่อนไขการกำหนดสีภาษี
+                    if ($taxDaysLeft < 0) {
+                        $taxColor = 'background-color: #D3D3D3 !important;'; // สีเทา
+                    } elseif ($taxDaysLeft <= 30) {
+                        $taxColor = 'background-color: #FFCCCC !important;'; // สีแดง
+                    } elseif ($taxDaysLeft <= 90) {
+                        $taxColor = 'background-color: #FFFF99 !important;'; // สีเหลือง
+                    }
+                @endphp --}}
+
+                <tr>
+                    <td>{{ $item->CarNumber }}</td>
+                    <td>{{ $item->CustomerName }}</td>
+                    <td>{{ $item->PhoneNumber }}</td>
+                    <td >
+                        {{ $item->next_Ins }}
+                    </td>
+                    <td >
+                        {{ $item->tax_expiry_date }}
+                    </td>
+                    <td>
+                        <a href="{{ route('infomation', $item->id) }}" class="btn btn-light btn-sm"
+                            style="background-color:#A4F02A">ดำเนินการต่อ</a>
+                    </td>
+                </tr>
+            @endforeach
         </tbody>
     </table>
 

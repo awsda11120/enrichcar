@@ -14,32 +14,43 @@
                         <div class="mb-3">
                             <p><strong>ประเภท(เลข) :</strong> {{ $data->TypeId }}</p>
                         </div>
+
                         @if ($sum_renew > 0)
                             <div class="mb-3">
-                                <p><strong>ค่า พ.ร.บ. (บาท) :</strong> {{ $sum_renew }}</p>
+                                <p><strong>ค่า พ.ร.บ. (บาท) :</strong> {{ number_format($sum_renew, 2) }}</p>
                             </div>
                         @endif
 
                         @if ($sum_tax > 0)
                             <div class="mb-3">
-                                <p><strong>ค่าภาษี (บาท) :</strong> {{ $sum_tax }}</p>
+                                <p><strong>ค่าภาษีก่อนลด (บาท) :</strong> {{ number_format($original_tax, 2) }}</p>
+                            </div>
+
+                            @if ($carYears >= 6)
+                                <div class="mb-3">
+                                    <p><strong>ส่วนลดภาษี {{ $discountPercent }}% (บาท) :</strong> {{ number_format($discountAmount, 2) }}</p>
+                                </div>
+                            @endif
+
+                            <div class="mb-3">
+                                <p><strong>ค่าภาษีหลังลด (บาท) :</strong> {{ number_format($sum_tax, 2) }}</p>
                             </div>
                         @endif
 
                         @if ($sum_fee > 0)
                             <div class="mb-3">
-                                <p><strong>ค่าบริการ (บาท) :</strong> {{ $sum_fee }}</p>
+                                <p><strong>ค่าบริการ (บาท) :</strong> {{ number_format($sum_fee, 2) }}</p>
                             </div>
                         @endif
 
                         @if ($sum_delivery > 0)
                             <div class="mb-3">
-                                <p><strong>ค่าจัดส่ง (บาท) :</strong> {{ $sum_delivery }}</p>
+                                <p><strong>ค่าจัดส่ง (บาท) :</strong> {{ number_format($sum_delivery, 2) }}</p>
                             </div>
                         @endif
 
                         <div class="mb-3">
-                            <p><strong>ยอดเงินสุทธิ (บาท) :</strong> {{ $sum_cost }}</p>
+                            <p><strong>ยอดเงินสุทธิ (บาท) :</strong> {{ number_format($sum_cost, 2) }}</p>
                         </div>
                     @else
                         <div class="alert alert-warning text-center" role="alert">
@@ -55,7 +66,6 @@
             </div>
             <div class="col-auto">
                 <form action="{{ route('storeHistory',['id' => $data->id]) }}" method="POST">
-            
                     @csrf
                     <input type="hidden" name="car_id" value="{{ $data->id }}">
                     <input type="hidden" name="calculateTax" value="{{ $calculateTax ? 1 : 0 }}">
@@ -65,9 +75,6 @@
                     <button type="submit" class="btn my-3" style="background-color:#A4F02A">ดำเนินการ</button>
                 </form>
             </div>
-
         </div>
     </div>
-
-    
 @endsection

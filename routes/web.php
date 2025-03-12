@@ -5,6 +5,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\CalculateController;
 use App\Http\Controllers\ChartController;
+use Illuminate\Support\Facades\Storage;
 
 // Route::get('/', [Admincontroller::class,'info']);
 Route::get('/', function () {
@@ -27,8 +28,8 @@ Route::get('deleteCus/{id}',[AdminController::class,'deleteCus'])->name('deleteC
 Route::get('deleteCar/{id}',[AdminController::class,'deleteCar'])->name('deleteCar');
 Route::get('editCus/{id}',[AdminController::class,'editCus'])->name('editCus');
 Route::get('editCar/{id}',[AdminController::class,'editCar'])->name('editCar');
-Route::post('updateCus/{id}',[AdminController::class,'updateCus'])->name('updateCus');
-Route::post('updateCar/{id}',[AdminController::class,'updateCar'])->name('updateCar');
+// Route::post('updateCus/{id}',[AdminController::class,'updateCus'])->name('updateCus');
+// Route::post('updateCar/{id}',[AdminController::class,'updateCar'])->name('updateCar');
 
 
 Route::get('/settings/general/{category}', [SettingsController::class, 'index']);
@@ -51,9 +52,16 @@ Route::get('/history/{id}',[AdminController::class,'storeHistory'])->name('histo
 Route::get('/ShowHis',[AdminController::class,'showHis']);
 Route::get('/sum', [ChartController::class, 'CarChart'])->name('sum');
 Route::get('/getChartData', [ChartController::class, 'getChartData']);
+Route::get('/receive',[AdminController::class,'showReceive']);
+Route::get('/sum', [ChartController::class, 'CarChart']);
+Route::get('/receive', [AdminController::class, 'showReceive'])->name('receiveStore');
 
 Route::post('/store-history', [AdminController::class, 'storeHistory'])->name('storeHistory');
 Route::post('/update-date-renew', [AdminController::class, 'updateDateRenew'])->name('updateDateRenew');
 
 
-
+Route::post('/history/update/{id}', [AdminController::class, 'storeHistoryReceive'])->name('history.update');
+// Route::post('/history/update/{id}', [HistoryController::class, 'updateHistory'])->name('history.update');
+// Route::get('/upload/{filename}', function ($filename) {
+//     return response()->file(storage_path('upload\doc' . $filename));
+// });

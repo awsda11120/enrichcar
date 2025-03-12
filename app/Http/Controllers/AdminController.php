@@ -7,39 +7,50 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\Car;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class AdminController extends Controller
 {
-    public function updateDateRenew(Request $request)
+
+public function updateDateRenew(Request $request)
 {
-    // try {
-    //     $request->validate([
-    //         'history_id' => 'required|integer|exists:histories,id',
-    //         'date_renew' => 'required|date',
-    //     ]);
-
-    //     DB::table('histories')->where('id', $request->history_id)->update([
-    //         'DateRenew' => $request->date_renew
-    //     ]);
-
-    //     return response()->json(['success' => true, 'message' => 'บันทึกสำเร็จ']);
-    // } catch (\Exception $e) {
-    //     return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
-    // }
     try {
         $request->validate([
-            'history_id' => 'required|integer|exists:histories,id',
+            'history_id' => 'required|integer|exists:histories,id',  // ตรวจสอบ history_id จากฐานข้อมูล histories
             'date_renew' => 'required|date',
         ]);
 
-        // อัปเดตวันที่และสถานะ
-        $updated = DB::table('histories')->where('id', $request->history_id)
-                    ->update([
-                        'DateRenew' => $request->date_renew,
-                        'status' => 1 // เปลี่ยนสถานะเป็น "เสร็จสิ้น"
-                    ]);
+        // ดึงข้อมูลจากตาราง histories โดยใช้ history_id
+        $history = DB::table('histories')->where('id', $request->history_id)->first();
+
+        if (!$history) {
+            return response()->json(['success' => false, 'message' => 'ไม่พบข้อมูลประวัติ']);
+        }
+
+        // อัปเดตข้อมูลในตาราง histories
+        $updated = DB::table('histories')->where('id', $history->id)
+            ->update([
+                'DateRenew' => $request->date_renew,
+                'status' => 1 // เปลี่ยนสถานะเป็น "เสร็จสิ้น"
+            ]);
 
         if ($updated) {
+            // อัปเดตข้อมูลในตาราง cars
+            $carUpdateData = [];
+            if ($history->TypeRenewIns == 1) {
+                $carUpdateData['InsHistoryDate'] = $request->date_renew;
+            }
+            if ($history->TypeRenewTax == 1) {
+                $carUpdateData['TaxHistoryDate'] = $request->date_renew;
+            }
+
+            // ตรวจสอบ CarId
+            if (isset($history->CarId)) {
+                DB::table('cars')->where('id', $history->CarId)->update($carUpdateData);
+            } else {
+                return response()->json(['success' => false, 'message' => 'ไม่พบหมายเลขรถ']);
+            }
+
             return response()->json(['success' => true, 'message' => 'บันทึกสำเร็จ']);
         } else {
             return response()->json(['success' => false, 'message' => 'บันทึกไม่สำเร็จ']);
@@ -47,61 +58,121 @@ class AdminController extends Controller
     } catch (\Exception $e) {
         return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
     }
+    $List =  DB::table('histories as htr')
+                 ->join('cars as c','htr.CarId','=','c.id')
+                 ->join('customers as cs', 'c.CusId', '=', 'cs.id')
+                 ->select('c.CarNumber','cs.CustomerName','cs.PhoneNumber','c.SelectOption','htr.status','htr.Receive','htr.id as history_id','htr.TypeRenewIns','htr.TypeRenewTax','c.id as car_id','htr.DateRenew','c.BookOwner')
+                 ->get();
 
+    return view('receive',['list' => $List]);
 }
 
-    public function storeHistory(Request $request)
-    {
 
+public function storeHistory(Request $request)
+{
     $type_ins = null;
     $type_tax = null;
+
     if ($request->input('calculateRenew') == 1) {
         $type_ins = 1;
-    }
-    else if ($request->input('calculateRenew') == 0) {
+    } else if ($request->input('calculateRenew') == 0) {
         $type_ins = 0;
     }
 
     if ($request->input('calculateTax') == 1) {
         $type_tax = 1;
-    }
-    else if ($request->input('calculateTax') == 0) {
+    } else if ($request->input('calculateTax') == 0) {
         $type_tax = 0;
     }
 
-
     $receive_option = $request->input('receive_option', '');
 
-    $dataData=[
+    // ตรวจสอบว่ามีข้อมูลที่เหมือนกันแล้วในฐานข้อมูลหรือยัง
+    $existingHistory = DB::table('histories')
+                         ->where('CarId', $request->car_id)
+                         ->where('TypeRenewIns', $type_ins)  // ตรวจสอบ TypeRenewIns
+                         ->where('TypeRenewTax', $type_tax)  // ตรวจสอบ TypeRenewTax
+                         ->whereNull('DateRenew')  // ตรวจสอบว่า DateRenew เป็น null หรือไม่
+                         ->first();
+
+    if ($existingHistory) {
+        return redirect()->route('history.index')->with('error', 'ข้อมูลนี้มีอยู่แล้วในระบบ');
+    }
+
+    // ถ้ายังไม่มีข้อมูลซ้ำ ก็สามารถเพิ่มข้อมูลได้
+    $dataData = [
         'CarId' => $request->car_id, // บันทึก Car ID ที่ส่งมาจากฟอร์ม
         'DateRenew' => null, // บันทึกวันที่ทำรายการ
-        // 'TypeRenew' => implode(', ', $type_renew), // บันทึกประเภทการต่ออายุ (พรบ. หรือ ภาษี)
         'TypeRenewIns' => $type_ins,
         'TypeRenewTax' => $type_tax,
         'Receive' => $receive_option, // บันทึกการรับเอกสาร
         'ProofOfReceive' => null, // ยังไม่มีหลักฐานการรับ
         'SumCost' => $request->total_cost,
     ];
+
     DB::table('histories')->insert($dataData);
 
-    $List =  DB::table('histories as htr')
-                 ->join('cars as c','htr.CarId','=','c.id')
-                 ->select('c.CarNumber','htr.status','htr.Receive','htr.id','htr.TypeRenewIns','htr.TypeRenewTax','c.id','c.BookOwner')
-                 ->get();
-    // $cID = $List->id;
+    // ดึงข้อมูลล่าสุดจากฐานข้อมูล
+    $List = DB::table('histories as htr')
+              ->join('cars as c', 'htr.CarId', '=', 'c.id')
+              ->select('c.CarNumber', 'htr.status', 'htr.Receive', 'htr.id as history_id', 'htr.TypeRenewIns', 'htr.TypeRenewTax', 'c.id as car_id', 'htr.DateRenew', 'c.BookOwner')
+              ->get();
 
-    return view('history',['list' => $List]);
-
-    // return redirect()->route('history')->with(['list' => $List, 'success' => 'บันทึกข้อมูลเรียบร้อยแล้ว']);
-
+    return view('history', ['list' => $List]);
 }
+
+public function storeHistoryReceive(Request $request, $id)
+{
+    $data = DB::table('histories as htr')
+        ->join('cars as c','htr.CarId','=','c.id')
+        ->join('customers as cs', 'c.CusId', '=', 'cs.id')
+        ->select('c.CarNumber','cs.CustomerName','cs.PhoneNumber','c.SelectOption','htr.ProofOfReceive','htr.status','htr.Receive','htr.id as history_id','htr.TypeRenewIns','htr.TypeRenewTax','c.id as car_id','htr.DateRenew','c.BookOwner')
+        ->where('htr.id', $id)
+        ->first();
+
+    // ตรวจสอบว่าข้อมูลมีอยู่หรือไม่
+    if (!$data) {
+        return redirect()->back()->withErrors(['error' => 'ไม่พบข้อมูลที่ต้องการ']);
+    }
+
+    // ตรวจสอบว่ามีการกรอกข้อมูลหรืออัปโหลดไฟล์
+    if ($data->SelectOption == 'จัดส่งตามที่อยู่') {
+        // ตรวจสอบว่าเลขพัสดุถูกกรอกหรือไม่
+        if (!$request->has('ProofOfReceive') || $request->input('ProofOfReceive') == '') {
+            return redirect()->back()->withErrors(['proof_required' => 'กรุณากรอกเลขพัสดุ']);
+        }
+        // เก็บเลขพัสดุ
+        DB::table('histories')->where('id', $id)->update([
+            'ProofOfReceive' => $request->input('ProofOfReceive')
+        ]);
+    } elseif ($data->SelectOption == 'มารับเอง') {
+        // ตรวจสอบว่าอัปโหลดไฟล์หรือไม่
+        if (!$request->hasFile('ProofOfReceive')) {
+            return redirect()->back()->withErrors(['proof_required' => 'กรุณาอัปโหลดไฟล์']);
+        }
+
+        // อัปโหลดไฟล์
+        $file = $request->file('ProofOfReceive');
+        $fileName = time() . '.' . $file->getClientOriginalExtension();
+        $file->storeAs('public/proofs', $fileName);
+
+        // เก็บชื่อไฟล์ในฐานข้อมูล
+        DB::table('histories')->where('id', $id)->update([
+            'ProofOfReceive' => $fileName
+        ]);
+    }
+
+    // รีไดเร็กต์กลับไปยังหน้าและแสดงข้อความสำเร็จ
+    return redirect()->route('receiveStore')->with('success', 'ข้อมูลได้รับการบันทึกเรียบร้อยแล้ว');
+}
+
 
 
     function showHis()
     {
         $List =  DB::table('histories as htr')
                  ->join('cars as c','htr.CarId','=','c.id')
-                 ->select('c.CarNumber','htr.status','htr.Receive','htr.id','htr.TypeRenewIns','htr.TypeRenewTax','htr.DateRenew','c.BookOwner')
+                 ->select('c.CarNumber','htr.status','htr.Receive','htr.ProofOfReceive','htr.id as history_id','htr.TypeRenewIns','htr.TypeRenewTax','c.id as car_id','htr.DateRenew','c.BookOwner')
                  ->get();
     // $cID = $List->id;
         // $his_id = $List->id;
@@ -109,79 +180,95 @@ class AdminController extends Controller
         return view('history',['list' => $List]);
     }
 
-
-
-
-    function showIn($id)
+    function showReceive()
     {
-        // $customer = DB::table('customers')->where('id', $id)->first();
-        // $car = DB::table('cars')->where('id', $id)->first(); // ดึงข้อมูลรถที่เกี่ยวข้องกับลูกค้า
-        // $total_year = session('total_year');
-    $List = DB::table('cars as c')
-    ->join('customers as cs', 'c.CusId', '=', 'cs.id')
-    ->select('c.id','c.BookOwner', 'cs.CustomerName','cs.NationalID','cs.PhoneNumber',
-    'cs.Address','c.SelectOption','c.TaxHistoryDate','c.InsHistoryDate','c.TaxId',
-    'c.CarCC','c.CarWeight','c.RegistrationDate')
-    ->where('c.id', $id)
-    ->first();
+        $List =  DB::table('histories as htr')
+                 ->join('cars as c','htr.CarId','=','c.id')
+                 ->join('customers as cs', 'c.CusId', '=', 'cs.id')
+                 ->select('c.CarNumber','cs.CustomerName','cs.PhoneNumber','htr.ProofOfReceive','c.SelectOption','htr.status','htr.Receive','htr.id as history_id','htr.TypeRenewIns','htr.TypeRenewTax','c.id as car_id','htr.DateRenew','c.BookOwner')
+                 ->get();
 
-    $registrationDate = Carbon::parse($List->RegistrationDate);
-    $carYears = intval($registrationDate->diffInYears(Carbon::now()));
-    $months = intval($registrationDate->diffInMonths(Carbon::now()) % 12); // หาจำนวนเดือน
-
-    // return view('infomation', compact('customer','car','carYears', 'months'));
-
-
-
-        $tax = $List->RegistrationDate;
-        $ins = $List->InsHistoryDate;
-
-
-
-            $register_day = date_create(date('Y-m-d',strtotime($tax)));
-            $today = date_create(date('Y-m-d'));
-            $diff = date_diff($register_day,$today);
-            $days = (int)$diff->format('%a')%365;     // เศษวัน
-            $total_year = floor((int)$diff->format('%a')/365);           // $regArr[1] = month
-            $regArr = explode("-",$tax);  // y , m , d =>$regArr[2] = day
-            // update year
-            $regArr[0] +=  $total_year;
-            $regArr[0] +=  ($days>0) ? 1 : 0;
-
-
-            //calculate days to renew from today
-            $date_renew =  date_create(date('Y-m-d',strtotime(implode("-",$regArr))));
-            $due_date_diff = date_diff($today,$date_renew);
-            $days = (int)$due_date_diff->format('%a')%365;
-            // $List[$index]->days = $days;
-            // $List[$index]->cls = ($days<=$d_danger) ? "bg_danger" : (($days>$d_danger&&$days<=$d_warning) ? "bg_warning" : "") ;
-            // $List[$index]->disabled = ($days<=$d_danger) ? "" : "disabled" ;
-            $date = (date('Y-m-d',strtotime($ins))); // Replace with your date
-            $newDate = date('d/m/Y', strtotime('+365 days', strtotime($date)));
-            // $List[$index]->next_Ins = $newDate;
-            $ins = date('Y-m-d',strtotime('+365 days', strtotime($date)));
-            $ins = date_create($ins);
-            $diff_ins = date_diff($today,$ins);
-            $days_ins = (int)$diff_ins->format('%a')%365;
-
-            echo"<br>".$days_ins."=>".$days;
-
-
-
-
-        // return view('infomation', compact('customer','car','total_year'));
-        return view('infomation', compact('days_ins','days','carYears'),["list"=>$List]);
-
+        return view('receive',['list' => $List]);
     }
 
 
 
 
-    function info(){
-        $List =  DB::table('cars as c')
-                 ->join('customers as cs','c.CusId','=','cs.id')
-                 ->select('c.CarNumber','c.RegistrationDate','c.InsHistoryDate','cs.CustomerName','cs.PhoneNumber','cs.id','c.BookOwner','c.id')
-                 ->get();
+    public function showIn($id)
+{
+    $List = DB::table('cars as c')
+        ->join('customers as cs', 'c.CusId', '=', 'cs.id')
+        ->select('c.id','c.BookOwner', 'cs.CustomerName','cs.NationalID','cs.PhoneNumber',
+            'cs.Address','c.SelectOption','c.TaxHistoryDate','c.InsHistoryDate','c.TaxId',
+            'c.CarCC','c.CarWeight','c.RegistrationDate')
+        ->where('c.id', $id)
+        ->first();
+
+    $registrationDate = Carbon::parse($List->RegistrationDate);
+    $carYears = intval($registrationDate->diffInYears(Carbon::now()));
+    $months = intval($registrationDate->diffInMonths(Carbon::now()) % 12); // หาจำนวนเดือน
+
+    // คำนวณวันหมดอายุภาษี
+    $today = date_create(date('Y-m-d')); // วันที่ปัจจุบัน
+    $regArr = explode("-", $List->RegistrationDate);
+    $regDay = $regArr[2];  // วัน
+    $regMonth = $regArr[1]; // เดือน
+
+    // คำนวณวันหมดอายุภาษี
+    $taxExpireDate = date_create($List->TaxHistoryDate); // วันต่อภาษีครั้งล่าสุด
+    $taxExpireDate->modify('+1 year'); // เพิ่ม 1 ปีจากวันต่อภาษี
+    $taxExpireDate->setDate($taxExpireDate->format('Y'), $regMonth, $regDay); // เปลี่ยนปีจาก TaxHistoryDate และใช้เดือน/วันจาก RegistrationDate
+    $List->tax_expiry_date = $taxExpireDate->format('d/m/Y'); // วันหมดอายุภาษีในรูปแบบ วัน/เดือน/ปี
+
+    // คำนวณจำนวนวันที่เหลือจนถึงวันหมดอายุภาษี
+    $diff_tax = date_diff($today, $taxExpireDate); // ความต่างระหว่างวันที่ปัจจุบันและวันหมดอายุภาษี
+    $days_left = (int)$diff_tax->format('%a'); // จำนวนวันเหลือจนถึงวันหมดอายุภาษี
+
+    // ตรวจสอบว่า $taxExpireDate อยู่ในอดีตหรือไม่
+    if ($taxExpireDate < $today) {
+        // ถ้า $taxExpireDate เก่ากว่า $today ให้ผลลัพธ์เป็นค่าลบ
+        $days_left = -(int)$diff_tax->format('%a') ;
+    } else {
+        // ถ้า $taxExpireDate อยู่ในอนาคตหรือวันนี้
+        $days_left = (int)$diff_tax->format('%a') ;
+    }
+
+    // คำนวณจำนวนวันจนถึงวันหมดอายุทะเบียน
+    $register_day = date_create(date('Y-m-d', strtotime($List->RegistrationDate)));
+    $diff_register = date_diff($register_day, $today);
+    $days = (int)$diff_register->format('%a') % 365; // เศษวัน
+
+    // คำนวณวันหมดอายุพรบ.
+    $date = (date('Y-m-d', strtotime($List->InsHistoryDate))); // Replace with your date
+    $newDate = date('d/m/Y', strtotime('+365 days', strtotime($date)));
+    $List->next_Ins = $newDate;
+    $ins = date('Y-m-d', strtotime('+365 days', strtotime($date)));
+    $ins = date_create($ins);
+    $diff_ins = date_diff($today, $ins);
+
+    // ตรวจสอบว่า $ins อยู่ในอดีตหรือไม่ ถ้าอยู่ในอดีตให้แสดงค่าเป็นลบ
+    if ($ins < $today) {
+        // ถ้า $ins เก่ากว่า $today ให้ผลลัพธ์เป็นค่าลบ
+        $days_ins = -(int)$diff_ins->format('%a') % 365;
+    } else {
+        // ถ้า $ins อยู่ในอนาคตหรือวันนี้
+        $days_ins = (int)$diff_ins->format('%a') % 365;
+    }
+
+    $total_year = floor((int)$diff_register->format('%a') / 365); // จำนวนปีที่เกิน
+
+    // ส่งข้อมูลไปยัง view
+    // $List->days = $days;
+    $List->days_ins = $days_ins;
+    $List->days = $days_left; // เพิ่มการส่งค่าจำนวนวันเหลือภาษี
+    echo "<br>" . $days_ins . " => " . $days_left;
+
+    // ส่งไปยังหน้า view
+    return view('infomation', compact('days_left','days_ins', 'days', 'carYears'), ["list" => $List]);
+}
+
+
+
 
         // calculate to renew ins
         foreach ($List as $index => $item) {
@@ -190,28 +277,73 @@ class AdminController extends Controller
             $d_expire = -1;
             // $ins_warning = 90;
             // $ins_danger = 30;
+    public function info()
+    {
+        try {
+            $List = DB::table('cars as c')
+                     ->join('customers as cs', 'c.CusId', '=', 'cs.id')
+                     ->select('c.CarNumber', 'c.TaxHistoryDate', 'c.RegistrationDate', 'c.InsHistoryDate', 'cs.CustomerName', 'cs.PhoneNumber', 'cs.id', 'c.BookOwner', 'c.id')
+                     ->get();
+
+            // คำนวณการต่ออายุภาษีและประกัน
+            foreach ($List as $index => $item) {
+                $d_warning = 90;
+                $d_danger = 30;
+                $d_expire = 0;
+                // $ins_warning = 90;
+                // $ins_danger = 30;
 
 
-            $register_day = date_create(date('Y-m-d',strtotime($item->RegistrationDate)));
-            $today = date_create(date('Y-m-d'));
-            $diff = date_diff($register_day,$today);
-            $days = (int)$diff->format('%a')%365;     // เศษวัน
-            $total_year = floor((int)$diff->format('%a')/365);           // $regArr[1] = month
-            $regArr = explode("-",$item->RegistrationDate);  // y , m , d =>$regArr[2] = day
-            // update year
-            $regArr[0] +=  $total_year;
-            $regArr[0] +=  ($days>0) ? 1 : 0;
+                $today = date_create(date('Y-m-d')); // วันที่ปัจจุบัน
 
-            // repack renew day
-            $List[$index]->renew = implode("/",array_reverse($regArr));
+                // แยกวัน, เดือน, ปี จาก RegistrationDate
+                $regArr = explode("-", $item->RegistrationDate);
+                $regDay = $regArr[2];  // วัน
+                $regMonth = $regArr[1]; // เดือน
+                $regYear = $regArr[0]; // ปี
 
-            //calculate days to renew from today
-            $date_renew =  date_create(date('Y-m-d',strtotime(implode("-",$regArr))));
-            $due_date_diff = date_diff($today,$date_renew);
-            $days = (int)$due_date_diff->format('%a')%365;
-            $List[$index]->days = $days;
-            if (!isset($List[$index])) {
-                $List[$index] = new stdClass();
+                // ใช้ TaxHistoryDate เป็นฐานในการคำนวณปี
+                $taxExpireDate = date_create($item->TaxHistoryDate); // วันต่อภาษีครั้งล่าสุด
+                $taxExpireDate->modify('+1 year'); // เพิ่ม 1 ปีจากวันต่อภาษี
+
+                // ใช้ปีจาก TaxHistoryDate แต่ใช้วันเดือนจาก RegistrationDate
+                $taxExpireDate->setDate($taxExpireDate->format('Y'), $regMonth, $regDay); // เปลี่ยนปีจาก TaxHistoryDate และใช้เดือน/วันจาก RegistrationDate
+
+                // เก็บวันที่หมดอายุภาษี
+                $List[$index]->tax_expiry_date = $taxExpireDate->format('d/m/Y'); // วันหมดอายุภาษีในรูปแบบ วัน/เดือน/ปี
+
+                // คำนวณจำนวนวันที่เหลือจนถึงวันหมดอายุภาษี
+                $diff = date_diff($today, $taxExpireDate); // ความต่างระหว่างวันที่ปัจจุบันและวันหมดอายุภาษี
+                $days_left = (int)$diff->format('%a'); // จำนวนวันเหลือจนถึงวันหมดอายุภาษี
+
+                // เก็บจำนวนวันที่เหลือ
+                $List[$index]->tax_days_left = $days_left;
+
+                //calculate days to renew from today
+                // $date_renew =  date_create(date('Y-m-d',strtotime(implode("-",$regArr))));
+                // $due_date_diff = date_diff($today,$date_renew);
+                // $days = (int)$due_date_diff->format('%a')%365;
+
+                // $List[$index]->days = $days;
+                // $List[$index]->cls = ($days<=$d_danger) ? "bg_danger" : (($days>$d_danger&&$days<=$d_warning) ? "bg_warning" : "") ;
+                // $List[$index]->disabled = ($days<=$d_danger) ? "" : "disabled" ;
+                $date = (date('Y-m-d',strtotime($item->InsHistoryDate))); // Replace with your date
+                $newDate = date('d/m/Y', strtotime('+365 days', strtotime($date)));
+                $List[$index]->next_Ins = $newDate;
+                $ins = date('Y-m-d',strtotime('+365 days', strtotime($date)));
+                $ins = date_create($ins);
+                $diff_ins = date_diff($today,$ins);
+                $days_ins = (int)$diff_ins->format('%a')%365;
+
+                $register_day = date_create(date('Y-m-d',strtotime($item->RegistrationDate)));
+                // $today = date_create(date('Y-m-d'));
+                $diff_register = date_diff($register_day,$today);
+                $days = (int)$diff_register->format('%a')%365;     // เศษวัน
+                $total_year = floor((int)$diff_register->format('%a')/365);
+
+                // $List[$index]->days = $days;
+                // $List[$index]->days_ins = $days_ins;
+
             }
 
             if ($days <= $d_expire) {
@@ -251,43 +383,16 @@ class AdminController extends Controller
             //     // $List[$index]->cls = ""; // no class if it doesn't match the conditions
             // }
 
+
+            session(['total_year' => $total_year]);
+
+            // ส่งข้อมูลไปยัง view
+            // dd($List);
+            return view('info', ["list" => $List]);
+
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
-
-        // foreach ($List as $index => $item) {
-        //     $d_warning = 90;
-        //     $d_danger = 30;
-        //     $d_null;
-
-        //     $date = (date('Y-m-d',strtotime($item->InsHistoryDate))); // Replace with your date
-        //     $newDate = date('d/m/Y', strtotime('+365 days', strtotime($date)));
-        //     $List[$index]->next_Ins = $newDate;
-        //     // $Ins_HisDay = date_create(date('Y-m-d',strtotime($item->InsHistoryDate)));
-        //     $today = date_create(date('Y-m-d'));
-        //     // $diff = date_diff($today,$Ins_HisDay);
-        //     // $days = (int)$diff->format('%a');
-        //     // // $List[$index]->next_Ins = $diff;
-        //     // if ($days >= 270 && $days <= 330) {
-        //     //     $List[$index]->cls = "bg_warning";
-        //     // } else if ($days >= 330 && $days <= 365) {
-        //     //     $List[$index]->cls = "bg_danger";
-        //     // } else if($days >= 365){
-        //     //     $List[$index]->cls = "";
-        //     // }
-        //     // $List[$index]->disabled = ($days<=$d_danger) ? "" : "disabled" ;
-
-        //     $ins = date('Y-m-d',strtotime('+365 days', strtotime($date)));
-        //     $ins = date_create($ins);
-        //     $diff_ins = date_diff($today,$ins);
-        //     $days_ins = (int)$diff_ins->format('%a')%365;
-        //     $List[$index]->cls2 = ($days_ins<=$d_danger) ? "bg_danger" : (($days_ins>$d_danger&&$days<=$d_warning) ? "bg_warning" : "") ;
-        //     $List[$index]->disabled = ($days_ins<=$d_danger) ? "" : "disabled" ;
-        //     // echo"<br>".$diff;
-        //      echo"<br>".$days_ins;
-        // }\
-
-        session(['total_year' => $total_year]);
-        return view('info',["list"=>$List]);
-
     }
 
 
@@ -458,11 +563,22 @@ class AdminController extends Controller
 
 
     function editInfo($id){
-        $customer=DB::table('customers')->where('id',$id)->first();
-        $car=DB::table('cars')->where('id',$id)->first();
+        $List = DB::table('cars as c')
+        ->join('customers as cs', 'c.CusId', '=', 'cs.id')
+        ->join('settings_renew as sr', 'sr.cartype_id', '=', 'c.TypeId')
+        ->join('taxes as t', 't.id', '=', 'c.TaxId')
+        ->select('c.id','c.CarNumber','c.CarCity','c.RegistrationDate','c.BookOwner', 'cs.CustomerName', 'cs.NationalID', 'cs.PhoneNumber',
+            'cs.Address', 'c.SelectOption', 'c.TaxHistoryDate', 'c.InsHistoryDate', 'c.TaxId',
+            'c.CarCC', 'c.CarWeight','t.name','c.TaxType', 'c.InsuranceType', 'c.TypeId', 'sr.renew_cost', 'sr.fee', 'sr.delivery_cost')
+        ->where('c.id', $id)
+        ->first();
+        $tax = $List->TaxId;
+
+        // if($tax==1)
+        // $customer=DB::table('customers')->where('id',$id)->first();
+        // $car=DB::table('cars')->where('id',$id)->first();
         $provinces = DB::table('provinces')->get();
-        $tax = DB::table('taxes')->get();
-        $taxCar = DB::table('taxes')->where('id',$id)->first();
+        $taxes = DB::table('taxes')->get();
         $settings["type"] = DB::table('settings')->where('category_key','=','car_type')->get();
         $List = DB::table('cars as c')
         ->join('customers as cs', 'c.CusId', '=', 'cs.id')
@@ -475,8 +591,9 @@ class AdminController extends Controller
         ->first();
         // $provi = $List->CarCity;
         // $settings["brand"] = DB::table('settings')->where('category_key','=','car_brand')->get();
+        return view('editInfo',["list"=>$List,'prov'=>$provinces,'sett'=>$settings,'taxes'=>$taxes]);
 
-        return view('editInfo', compact('customer','car'),['prov'=>$provinces,'sett'=>$settings,'tax'=>$tax]);
+        // return view('editInfo', compact('customer','car'),['prov'=>$provinces,'sett'=>$settings]);
     }
 
     function updateInfo(Request $requestEdit, $id){
@@ -587,15 +704,25 @@ class AdminController extends Controller
 
 
         // find duplicate the customer by  national id number.
-        // $findCus =  DB::table('customers')->where('NationalID',$requestEdit->NationalID)->first();
+        // $findCus =  DB::table('customers')->where('NationalID',$requestInfo->NationalID)->first();
         // $rows = count((array)$findCus);
         // if(!$rows){
-        //     $CusID = DB::table('customers')->updateGetId($dataCus);
+        //     $CusID = DB::table('customers')->insertGetId($dataCus);
         //     $dataCar["CusId"] = $CusID;
         // }else{
         //     $dataCar["CusId"] = $findCus->id;
         //     $errorMsg[] = 'พบข้อมูลบัตรประชาชนถูกใช้งานแล้ว';
         // }
+
+        // // find duplicate the car by plate number.
+        // $findCar =  DB::table('cars')->where('CarNumber',$PlateNumber)->first();
+        // $rows = count((array)$findCar);
+        // if(!$rows){
+        //     DB::table('cars')->insert($dataCar);
+        // }else{
+        //     $errorMsg[] = 'ป้ายทะเบียนนี้ถูกใช้งานแล้ว';
+        // }
+        // $Url = (count($errorMsg)) ? '/info' : '/info';
 
 
         // // find duplicate the car by plate number.
@@ -608,9 +735,11 @@ class AdminController extends Controller
         // }
         // $Url = (count($errorMsg)) ? '/info' : '/info';
 
+        // DB::table('cus_and_cars')->insert($dataCusAndCar);
         DB::table('customers')->where('id',$id)->update($dataCus);
         DB::table('cars')->where('id',$id)->update($dataCar);
         return redirect('/info');
 
     }
+}
 }
