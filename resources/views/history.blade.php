@@ -4,23 +4,14 @@
 
     <div class="row">
         <div class="col-md-2 ">
-            <label for="CustomerName" class="form-label fs-5">ประวัติการดำเนินการ</label>
+            <label for="CustomerName" class="form-label fs-5">ต้นหาเลขทะเบียนรถ</label>
         </div>
-        <div class="col-md-1 ">
-            <label for="CustomerName" class="form-label fs-5">จาก</label>
-        </div>
-        <div class="col-md-3 ">
-            <input type="text" class="form-control datepicker" name="RegistrationDate" readonly>
-        </div>
-        <div class="col-md-1 ">
-            <label for="CustomerName" class="form-label fs-5">ถึง</label>
-        </div>
-        <div class="col-md-3 ">
-            <input type="text" class="form-control datepicker" name="RegistrationDate" readonly>
-        </div>
-        <div class="col-md-2 ">
-            <span><a href="#" class="btn mx-2" style="background-color:#F7CBC7">ค้นหา</a></span>
-        </div>
+        <form class="d-flex col-md-2 " role="search">
+            <input id="searchInput" class="form-control me-2" type="search" aria-label="Search"
+                placeholder="ค้นหาเลขทะเบียน...">
+
+        </form>
+
     </div>
     <hr>
     <table class="table  table-grid">
@@ -86,34 +77,34 @@
                 autoclose: true,
                 todayHighlight: true
             });
-    
+
             // คลิกปุ่ม "แก้ไข"
             $('.edit-btn').click(function() {
                 let historyId = $(this).data('id');
                 let dateRenew = $(this).data('date');
                 let row = $(this).closest('tr');
-    
+
                 // เปิดให้เลือกวันที่ใหม่
                 let dateInput = row.find('.date-renew-input');
                 dateInput.removeAttr('readonly');
                 dateInput.val(dateRenew); // กำหนดวันที่เดิมให้แสดงในช่อง
-    
+
                 // เปลี่ยนสีของปุ่ม "เสร็จสิ้น" เป็นสีเขียว
                 row.find('.complete-btn').css("background-color", "#A4F02A").prop("disabled", false);
             });
-    
+
             // คลิกปุ่ม "เสร็จสิ้น"
             $('.complete-btn').click(function() {
                 let historyId = $(this).data('id');
                 let dateRenew = $(this).closest('tr').find('.date-renew-input').val();
                 let button = $(this);
-    
+
                 // ตรวจสอบว่าได้เลือกวันที่หรือไม่
                 if (!dateRenew) {
                     alert('กรุณาเลือกวันที่ก่อนกดปุ่มเสร็จสิ้น');
                     return;
                 }
-    
+
                 $.ajax({
                     url: "{{ route('updateDateRenew') }}",
                     type: "POST",
@@ -129,7 +120,7 @@
                                 "background-color": "#ccc",
                                 "cursor": "not-allowed"
                             }).prop("disabled", true).text("เสร็จสิ้นแล้ว");
-    
+
                             alert('วันที่ถูกบันทึกเรียบร้อยแล้ว');
                         } else {
                             alert("เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง");
@@ -140,6 +131,16 @@
                     }
                 });
             });
+            $(document).ready(function() {
+                $("#searchInput").on("keyup", function() {
+                    let value = $(this).val().toLowerCase();
+                    $("table tbody tr").filter(function() {
+                        $(this).toggle($(this).find("td:nth-child(2)").text().toLowerCase()
+                            .indexOf(value) > -1);
+                    });
+                });
+            });
         });
-    </script>    
+    </script>
+
 @endsection
