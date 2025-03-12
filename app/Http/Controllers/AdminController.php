@@ -187,7 +187,7 @@ class AdminController extends Controller
         foreach ($List as $index => $item) {
             $d_warning = 90;
             $d_danger = 30;
-            $d_expire = 0;
+            $d_expire = -1;
             // $ins_warning = 90;
             // $ins_danger = 30;
 
@@ -216,15 +216,15 @@ class AdminController extends Controller
 
             if ($days <= $d_expire) {
                 $List[$index]->cls = "bg_expire";
-            } elseif ($days <= $d_danger) {
+            } else if ($days <= $d_danger&&$days>$d_expire) {
                 $List[$index]->cls = "bg_danger";
-            } elseif ($days <= $d_warning) {
+            } else if ($days <= $d_warning&&$days>$d_danger) {
                 $List[$index]->cls = "bg_warning";
             } else {
                 $List[$index]->cls = ""; // ค่าเริ่มต้นหากไม่เข้าเงื่อนไขใดเลย
             }
             // $List[$index]->cls = ($days<=$d_expire) ? "bg_expire" : ($days<=$d_danger) ? "bg_danger" : (($days>$d_danger&&$days<=$d_warning) ? "bg_warning" :"");
-            $List[$index]->disabled = ($days<=$d_danger) ? "" : "disabled" ;
+            // $List[$index]->disabled = ($days<=$d_danger) ? "" : "disabled" ;
             $date = (date('Y-m-d',strtotime($item->InsHistoryDate))); // Replace with your date
             $newDate = date('d/m/Y', strtotime('+365 days', strtotime($date)));
             $List[$index]->next_Ins = $newDate;
@@ -461,17 +461,27 @@ class AdminController extends Controller
         $customer=DB::table('customers')->where('id',$id)->first();
         $car=DB::table('cars')->where('id',$id)->first();
         $provinces = DB::table('provinces')->get();
+        $tax = DB::table('taxes')->get();
+        $taxCar = DB::table('taxes')->where('id',$id)->first();
         $settings["type"] = DB::table('settings')->where('category_key','=','car_type')->get();
+        $List = DB::table('cars as c')
+        ->join('customers as cs', 'c.CusId', '=', 'cs.id')
+        ->join('settings_renew as sr', 'sr.cartype_id', '=', 'c.TypeId')
+        ->join('taxes as t', 't.id', '=', 'c.TaxId')
+        ->select('c.id','c.CarNumber','c.CarCity','c.RegistrationDate','c.BookOwner', 'cs.CustomerName', 'cs.NationalID', 'cs.PhoneNumber',
+            'cs.Address', 'c.SelectOption', 'c.TaxHistoryDate', 'c.InsHistoryDate', 'c.TaxId',
+            'c.CarCC', 'c.CarWeight','t.name','c.TaxType', 'c.InsuranceType', 'c.TypeId', 'sr.renew_cost', 'sr.fee', 'sr.delivery_cost')
+        ->where('c.id', $id)
+        ->first();
+        // $provi = $List->CarCity;
         // $settings["brand"] = DB::table('settings')->where('category_key','=','car_brand')->get();
 
-        return view('editInfo', compact('customer','car'),['prov'=>$provinces,'sett'=>$settings]);
+        return view('editInfo', compact('customer','car'),['prov'=>$provinces,'sett'=>$settings,'tax'=>$tax]);
     }
 
-    function updateInfo(Request $requestInfo, $id){
-
-
+    function updateInfo(Request $requestEdit, $id){
         $errorMsg = [];
-        $requestInfo->validate([
+        $requestEdit->validate([
             'CustomerName'=>'required',
             'NationalID'=>'required|min:13|max:13',
             'PhoneNumber'=>'required|min:10|max:10',
@@ -484,7 +494,7 @@ class AdminController extends Controller
             'InsuranceType'=>'required',
             'TaxType'=>'required',
             'RegistrationDate'=>'required',
-            // 'BookOwner'=>'required',
+            //'BookOwner'=>'required',
             'TaxHistoryDate'=>'required',
             'SelectOption'=>'required',
             'InsHistoryDate'=>'required',
@@ -507,45 +517,49 @@ class AdminController extends Controller
             'InsuranceType.required'=>'*กรุณาระบุประเภท พ.ร.บ.*',
             'TaxType.required'=>'*กรุณาระบุประเภทภาษี*',
             'RegistrationDate.required'=>'*กรุณาระบุวันที่จดทะเบียน*',
-            // 'BookOwner'=>'required',
+            //'BookOwner'=>'required',
             'TaxHistoryDate.required'=>'*กรุณาระบุวันที่ต่อภาษีครั้งล่าสุด*',
             'SelectOption.required'=>'*กรุณาเลือกการรับเอกสาร*',
             'InsHistoryDate.required'=>'*กรุณาระบุวันที่ต่อ พ.ร.บ. ครั้งล่าสุด*',
         ]);
+
+
+
+    $carTypeId = DB::table('settings')
+    ->whereIn('category_key', ['car_type', 'car_brand'])
+    ->where('name', '=',  $requestEdit->InsuranceType)
+    ->value('id');
+
+    $carTaxId = DB::table('taxes')
+    ->where('name', '=',  $requestEdit->TaxType)
+    ->value('id');
+
+
         $dataCus=[
-            'CustomerName'=>$requestInfo->CustomerName,
-            'NationalID'=>$requestInfo->NationalID,
-            'PhoneNumber'=>$requestInfo->PhoneNumber,
-            'Address'=>$requestInfo->Address
+            'CustomerName'=> $requestEdit->CustomerName,
+            'NationalID'=> $requestEdit->NationalID,
+            'PhoneNumber'=> $requestEdit->PhoneNumber,
+            'Address'=> $requestEdit->Address
         ];
 
-        $PlateNumber = $requestInfo->CarNumber." ".$requestInfo->CarCity;
+        $PlateNumber =  $requestEdit->CarNumber." ". $requestEdit->CarCity;
         $dataCar=[
-            'CarNumber'=>$PlateNumber,
-            'CarCity'=>$requestInfo->CarCity,
-            'CarWeight'=>$requestInfo->CarWeight,
-            'CarCC'=>$requestInfo->CarCC,
-            'InsuranceType'=>$requestInfo->InsuranceType,
-            'TaxType'=>$requestInfo->TaxType,
-            'RegistrationDate'=>$requestInfo->RegistrationDate,
-            // 'BookOwner'=>$requestInfo->RegistrationDate,
-            'TaxHistoryDate'=>$requestInfo->TaxHistoryDate,
-            'SelectOption'=>$requestInfo->SelectOption,
-            'InsHistoryDate'=>$requestInfo->InsHistoryDate,
+            'CarNumber'=>$requestEdit->CarNumber,
+            'CarCity'=> $requestEdit->CarCity,
+            'CarWeight'=> $requestEdit->CarWeight,
+            'CarCC'=> $requestEdit->CarCC,
+            'InsuranceType'=> $requestEdit->InsuranceType,
+            'TaxType'=> $requestEdit->TaxType,
+            'RegistrationDate'=> $requestEdit->RegistrationDate,
+            //'BookOwner'=>$requestInfo->RegistrationDate,
+            'TaxHistoryDate'=> $requestEdit->TaxHistoryDate,
+            'SelectOption'=> $requestEdit->SelectOption,
+            'InsHistoryDate'=> $requestEdit->InsHistoryDate,
+            'TypeId' => $carTypeId,
+            'TaxId' => $carTaxId,
+
 
         ];
-        // $dataCusAndCar=[
-        //     'CarNumber'=>$requestInfo->CarNumber,
-        //     'CarCity'=>$requestInfo->CarCity,
-        //     'CustomerName'=>$requestInfo->CustomerName,
-        //     'PhoneNumber'=>$requestInfo->PhoneNumber,
-        //     'RegistrationDate'=>$requestInfo->RegistrationDate
-
-        // ];
-        // $file = $requestInfo->file('singleFile');
-        // $name =  $file->getClientOriginalExtension();
-        // validate and upload single file
-
             $Img = $_FILES["singleFile"];
             $ext = pathinfo($Img["name"], PATHINFO_EXTENSION);
             // validate file extension
@@ -570,33 +584,33 @@ class AdminController extends Controller
                     $dataCar["BookOwner"] = $Img["name"];
                 }
             }
+
+
         // find duplicate the customer by  national id number.
-        $findCus =  DB::table('customers')->where('NationalID',$requestInfo->NationalID)->first();
-        $rows = count((array)$findCus);
-        if(!$rows){
-            $CusID = DB::table('customers')->insertGetId($dataCus);
-            $dataCar["CusId"] = $CusID;
-        }else{
-            $dataCar["CusId"] = $findCus->id;
-            $errorMsg[] = 'พบข้อมูลบัตรประชาชนถูกใช้งานแล้ว';
-        }
-
-        // find duplicate the car by plate number.
-        $findCar =  DB::table('cars')->where('CarNumber',$PlateNumber)->first();
-        $rows = count((array)$findCar);
-        if(!$rows){
-            DB::table('cars')->insert($dataCar);
-        }else{
-            $errorMsg[] = 'ป้ายทะเบียนนี้ถูกใช้งานแล้ว';
-        }
-        $Url = (count($errorMsg)) ? '/info' : '/info';
+        // $findCus =  DB::table('customers')->where('NationalID',$requestEdit->NationalID)->first();
+        // $rows = count((array)$findCus);
+        // if(!$rows){
+        //     $CusID = DB::table('customers')->updateGetId($dataCus);
+        //     $dataCar["CusId"] = $CusID;
+        // }else{
+        //     $dataCar["CusId"] = $findCus->id;
+        //     $errorMsg[] = 'พบข้อมูลบัตรประชาชนถูกใช้งานแล้ว';
+        // }
 
 
+        // // find duplicate the car by plate number.
+        // $findCar =  DB::table('cars')->where('CarNumber',$PlateNumber)->first();
+        // $rows = count((array)$findCar);
+        // if(!$rows){
+        //     DB::table('cars')->update($dataCar);
+        // }else{
+        //     $errorMsg[] = 'ป้ายทะเบียนนี้ถูกใช้งานแล้ว';
+        // }
+        // $Url = (count($errorMsg)) ? '/info' : '/info';
 
-        // DB::table('cus_and_cars')->insert($dataCusAndCar);
-        DB::table('customers')->where('id',$id)->update($dataCustomer);
+        DB::table('customers')->where('id',$id)->update($dataCus);
         DB::table('cars')->where('id',$id)->update($dataCar);
-        return redirect('info');
+        return redirect('/info');
 
     }
 }

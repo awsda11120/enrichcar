@@ -49,8 +49,8 @@ Route::post('CheckCosts/{id}/{typeRenew?}', [CalculateController::class, 'CalCos
 Route::get('InsView',[AdminController::class,'InsView']);
 Route::get('/history/{id}',[AdminController::class,'storeHistory'])->name('history');
 Route::get('/ShowHis',[AdminController::class,'showHis']);
-Route::get('/sum', [ChartController::class, 'CarChart']);
-
+Route::get('/sum', [ChartController::class, 'CarChart'])->name('sum');
+Route::get('/getChartData', [ChartController::class, 'getChartData']);
 
 Route::post('/store-history', [AdminController::class, 'storeHistory'])->name('storeHistory');
 Route::post('/update-date-renew', [AdminController::class, 'updateDateRenew'])->name('updateDateRenew');

@@ -27,7 +27,7 @@
                                     <p class="form-text">{{ $list->PhoneNumber }}</p>
                                 </div>
                                 <div class="col-md-6">
-                                    <label for="Address" class="form-label fw-bold">ที่อยู่ปัจจุบัน:</label>
+                                    <label for="Address" class="form-label fw-bold">ที่อยู่จัดส่ง:</label>
                                     <p class="form-text">{{ $list->Address }}</p>
                                 </div>
                             </div>
@@ -129,7 +129,7 @@
 
                     <div class="d-flex justify-content-between align-items-center">
                         <a href="/info" class="btn my-3" style="background-color:#9fdffa"> กลับ</a>
-                        <a href="/info" class="btn my-3" style="background-color:#F0DF2A">แก้ไข</a>
+                        <a href="{{route('editInfo',$list->id)}}" class="btn my-3" style="background-color:#F0DF2A">แก้ไข</a>
                         <button type="submit" class="btn my-3" style="background-color:#A4F02A">ดำเนินการ</button>
                     </div>
                 </form>
@@ -144,7 +144,7 @@
         </div>
     </div>
 @endsection
-{{-- 
+{{--
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function() {

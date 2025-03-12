@@ -59,23 +59,34 @@
         </thead>
         <tbody class="text-center">
             @foreach ($list as $item)
-                @php
-                    $insDaysLeft = (strtotime($item->next_Ins) - time()) / (60 * 60 * 24);
-                    $taxDaysLeft = (strtotime($item->renew) - time()) / (60 * 60 * 24);
-                @endphp
+            @php
+                $insDaysLeft = (strtotime($item->next_Ins) - time()) / (60 * 60 * 24);
+                $taxDaysLeft = (strtotime($item->renew) - time()) / (60 * 60 * 24);
 
-                <tr class="{{ $item->cls }}" data-ins-days="{{ $insDaysLeft }}" data-tax-days="{{ $taxDaysLeft }}">
-                    <td style="background:#FFF!important;">{{ $item->CarNumber }}</td>
-                    <td style="background:#FFF!important;">{{ $item->CustomerName }}</td>
-                    <td style="background:#FFF!important;">{{ $item->PhoneNumber }}</td>
-                    <td>{{ $item->next_Ins }}</td>
-                    <td>{{ $item->renew }}</td>
-                    <td style="background:#FFF!important;">
-                        <a href="{{ route('infomation', $item->id) }}" class="btn btn-light btn-sm"
-                            style="background-color:#A4F02A">ดำเนินการต่อ</a>
-                    </td>
-                </tr>
-            @endforeach
+                // function getBgColor($daysLeft) {
+                //     if ($daysLeft < 0) {
+                //         return 'background-color: #D3D3D3 !important;'; // สีเทา: หมดอายุแล้ว
+                //     } elseif ($daysLeft <= 30) {
+                //         return 'background-color: #FFCCCC !important;'; // สีแดง: ใกล้หมดอายุใน 30 วัน
+                //     } elseif ($daysLeft <= 90) {
+                //         return 'background-color: #FFFF99 !important;'; // สีเหลือง: ใกล้หมดอายุใน 90 วัน
+                //     }
+                //     return ''; // ไม่มีสี
+                // }
+            @endphp
+
+            <tr class="{{ $item->cls }}">
+                <td style="background:#FFF!important;">{{ $item->CarNumber }}</td>
+                <td style="background:#FFF!important;">{{ $item->CustomerName }}</td>
+                <td style="background:#FFF!important;">{{ $item->PhoneNumber }}</td>
+                <td>{{ $item->next_Ins }}</td>
+                <td>{{ $item->renew }}</td>
+                <td style="background:#FFF!important;">
+                    <a href="{{ route('infomation', $item->id) }}" class="btn btn-light btn-sm"
+                        style="background-color:#A4F02A">ดำเนินการต่อ</a>
+                </td>
+            </tr>
+        @endforeach
         </tbody>
     </table>
 
