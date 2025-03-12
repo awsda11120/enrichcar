@@ -99,7 +99,6 @@
             border: #EC0000 1px solid;
         }
 
-        /* addinfo form */
         #addinfo label {
             margin-top: 20px;
             font-size: 14px;
@@ -162,23 +161,26 @@
 
 
         /* end add info form */
-        .errMsg ul li{
+        .errMsg ul li {
             list-style: none;
-            color:#EC0000;
+            color: #EC0000;
         }
+
         .bg_danger td {
-            background:#f87979!important;
-            color:##000;
+            background: #f87979 !important;
+            color: ##000;
         }
 
         .bg_warning td {
-            background:#FFFF99!important;
-            color:#000;
+            background: #FFFF99 !important;
+            color: #000;
         }
-        .bg_expire td{
-            background:#D3D3D3!important;
-            color:#000;
+
+        .bg_expire td {
+            background: #D3D3D3 !important;
+            color: #000;
         }
+
         /*
         .exp {
             background-color: gray !important;
@@ -269,7 +271,7 @@
             <div class="sidebar">
                 <a href="/info" class="{{ request()->is('info') ? 'active' : '' }}"><i class="bi bi-car-front"></i>
                     ข้อมูล</a>
-                <a href="/ShowHis" class="{{ request()->is('showHis') ? 'active' : '' }}"><i
+                    <a href="/ShowHis" class="{{ request()->is('ShowHis') || request()->is('showHis') ? 'active' : '' }}"><i
                         class="bi bi-clock-history"></i> ประวัติทำรายการ</a>
                 <a href="/receive" class="{{ request()->is('receive') ? 'active' : '' }}"><i class="bi bi-box-seam"></i>
                     การรับเอกสาร</a>
