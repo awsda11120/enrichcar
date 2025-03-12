@@ -1,21 +1,38 @@
 @extends('layout')
 
 @section('content')
-<div class="container">
-    <h3>กราฟแสดงจำนวนประเภทรถที่ต่อ พ.ร.บ. และภาษี</h3>
+<div class="row">
+    <div class="container mb-3">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h4>กราฟแสดงจำนวนประเภทรถที่ต่อ พ.ร.บ. และภาษี</h4>
+            </div>
+            <div class="col-md-6">
+                <label for="monthSelect">เลือกเดือนที่แสดงข้อมูล</label>
+                <select id="monthSelect" class="form-control">
+                    @foreach ($months as $month)
+                        <option value="{{ $month }}">{{ $month }}</option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
+    </div>
+
     <hr>
     <div class="row">
-        <div class="col-md-12">
+        <div class="col-md-8 mb-5">
             <h5>การต่อ พ.ร.บ.</h5>
             <canvas id="barChartInsurance"></canvas>
         </div>
-        <hr>
-        <div class="col-md-12 mt-4">
+        <hr class="my-5">
+
+        <div class="col-md-8 mt-5 mb-5">
             <h5>การต่อภาษี</h5>
             <canvas id="barChartTax"></canvas>
         </div>
-        <hr>
-        <div class="col-md-8 mt-4">
+        <hr class="my-5">
+
+        <div class="col-md-6 mt-5 mb-5">
             <h5>รายได้รวมจากการต่อ พ.ร.บ. และภาษี</h5>
             <canvas id="pieChartCost"></canvas>
         </div>
@@ -145,4 +162,31 @@
         // plugins : [ChartDataLabels]
     });
 </script>
+<script>
+    document.getElementById('monthSelect').addEventListener('change', function() {
+        let selectedMonth = this.value;
+
+        fetch(`/getChartData?month=${selectedMonth}`)
+            .then(response => response.json())
+            .then(data => {
+                updateCharts(data);
+            })
+            .catch(error => console.error('Error:', error));
+    });
+
+    function updateCharts(data) {
+        // อัปเดตข้อมูลของแต่ละกราฟ
+        barChartInsurance.data.labels = data.insurance.labels;
+        barChartInsurance.data.datasets[0].data = data.insurance.data;
+        barChartInsurance.update();
+
+        barChartTax.data.labels = data.tax.labels;
+        barChartTax.data.datasets[0].data = data.tax.data;
+        barChartTax.update();
+
+        pieChartCost.data.datasets[0].data = [data.insurance.total_cost, data.tax.total_cost];
+        pieChartCost.update();
+    }
+    </script>
+
 @endsection
