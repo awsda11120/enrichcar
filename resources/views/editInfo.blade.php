@@ -77,7 +77,7 @@
                             <div class="col-md-3">
                                 <label for="CarNumber" class="form-label">เลขทะเบียน</label>
                                 <input type="text" class="form-control" name="CarNumber" class="form-control"
-                                    value="{{ $list->CarNumber }}">
+                                    value="{{ Str::before($list->CarNumber, ' ')}}">
                                 @error('CarNumber')
                                     <div class="my-1">
                                         <span class="text-danger">{{ $message }}</span>
