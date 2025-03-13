@@ -2,7 +2,7 @@
 @section('doc', 'Show Information')
 @section('content')
     <div class="container py-5">
-        <h3 class="text-center mb-4 display-6 ">ต่อ พรบ./ต่อภาษี</h3>
+        <h3 class="text-center mb-4 display-6 ">ต่อ พ.ร.บ. / ต่อภาษี</h3>
 
         <div class="row justify-content-center">
             <div class="col-lg-8">
@@ -111,16 +111,10 @@
 
                     <div class="d-flex justify-content-between align-items-center">
                         <a href="/info" class="btn my-3" style="background-color:#9fdffa"> กลับ</a>
+                        <a href="{{ route('editInfo', ['id' => $list->id]) }}" class="btn my-3" style="background-color:#F0DF2A">แก้ไข</a>
                         <button type="submit" class="btn my-3" style="background-color:#A4F02A">ดำเนินการ</button>
                     </div>
                 </form>
-                {{-- <div class="d-flex justify-content-between align-items-center">
-                    <a href="/info" class="btn my-3" style="background-color:#9fdffa"> กลับ</a>
-                    <a href="/info" class="btn my-3"
-                        style="background-color:#F0DF2A">แก้ไข</a>
-                    <a href="{{ route('CheckCosts', ['id' => $list->id]) }}" class="btn my-3"
-                        style="background-color:#A4F02A">ดำเนินการ</a>
-                </div> --}}
             </div>
         </div>
     </div>
