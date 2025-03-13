@@ -33,15 +33,20 @@
                 <th scope="col">การรับเอกสาร</th>
                 <th scope="col">ดาวน์โหลด</th>
                 <th scope="col">สถานะ</th>
-                <th scope="col">การดำเนินการ</th>
             </tr>
         </thead>
         <tbody class="text-center">
             @foreach ($list as $item)
                 <tr>
                     <td>
-                        <input type="text" class="form-control datepicker col-md-2 date-renew-input"
-                            data-id="{{ $item->history_id }}" value="{{ $item->DateRenew }}" readonly>
+                        <div class="d-flex align-items-center">
+                            <input type="text" class="form-control datepicker date-renew-input me-2"
+                                data-id="{{ $item->history_id }}" value="{{ $item->DateRenew }}" readonly>
+                            <button class="btn btn-warning btn-sm edit-btn" data-id="{{ $item->history_id }}"
+                                data-date="{{ $item->DateRenew }}" style="background-color: #F9D74E; border: none;">
+                                แก้ไข
+                            </button>
+                        </div>
                     </td>
                     <td>{{ $item->CarNumber }}</td>
                     <td>
@@ -75,22 +80,25 @@
                             {{ $item->status == 1 ? 'disabled' : '' }}>
                             {{ $item->status == 1 ? 'เสร็จสิ้น' : 'เสร็จสิ้น' }}
                         </button>
-
-                    </td>
-                    <td>
-                        <!-- เพิ่มปุ่ม "แก้ไข" -->
-                        <button class="btn btn-warning btn-sm edit-btn" data-id="{{ $item->history_id }}"
-                            data-date="{{ $item->DateRenew }}">
-                            แก้ไข
-                        </button>
                     </td>
                 </tr>
             @endforeach
-
         </tbody>
     </table>
     <script>
         $(document).ready(function() {
+            // ทำการโหลดข้อมูลวันที่เมื่อหน้าโหลดใหม่
+            $('.date-renew-input').each(function() {
+                let row = $(this).closest('tr');
+                let status = row.find('.complete-btn').prop("disabled");
+
+                // ถ้าปุ่ม "เสร็จสิ้น" ถูก disable แล้ว แสดงว่าเสร็จสิ้นแล้ว
+                if (status) {
+                    $(this).prop("readonly", true).css("background-color",
+                    "#f0f0f0"); // ทำให้วันที่ไม่สามารถเลือกได้
+                }
+            });
+
             $(".datepicker").datepicker({
                 format: "yyyy-mm-dd",
                 autoclose: true,
@@ -99,48 +107,70 @@
 
             // คลิกปุ่ม "แก้ไข"
             $('.edit-btn').click(function() {
-                let historyId = $(this).data('id'); // ดึงค่า id ที่เป็น history_id
+                let historyId = $(this).data('id');
                 let dateRenew = $(this).data('date');
                 let row = $(this).closest('tr');
-
-                // เปิดให้เลือกวันที่ใหม่
                 let dateInput = row.find('.date-renew-input');
-                dateInput.removeAttr('readonly');
-                dateInput.val(dateRenew); // กำหนดวันที่เดิมให้แสดงในช่อง
+                let editButton = $(this);
 
-                // เปลี่ยนสีของปุ่ม "เสร็จสิ้น" เป็นสีเขียว และเปิดให้คลิกได้
+                // ทำให้ช่องวันที่สามารถแก้ไขได้
+                dateInput.removeAttr('readonly').css("background-color",
+                "#fff"); // เปลี่ยนพื้นหลังให้เป็นปกติ
+
+                dateInput.val(dateRenew);
+
+                // เปลี่ยนสีของปุ่ม "แก้ไข" เมื่อถูกคลิกและทำให้มันทึบ
+                editButton.prop("disabled", true).css({
+                    "opacity": "0.5",
+                    "background-color": "#ccc", // เปลี่ยนสีเป็นเทา
+                    "border": "none" // ลบขอบสีเหลืองออก
+                });
+
+                // ทำให้ปุ่ม "เสร็จสิ้น" สามารถคลิกได้
                 row.find('.complete-btn').css({
-                    "background-color": "#A4F02A",
+                    "background-color": "#A4F02A", // ใช้สีเดียวกับปุ่ม "เสร็จสิ้น"
                     "cursor": "pointer"
                 }).prop("disabled", false);
             });
 
             // คลิกปุ่ม "เสร็จสิ้น"
             $('.complete-btn').click(function() {
-                let historyId = $(this).data('id'); // ใช้ data-id เพื่อรับค่า history_id จากปุ่ม
-                let dateRenew = $(this).closest('tr').find('.date-renew-input').val();
-                let button = $(this);
+                let historyId = $(this).data('id');
+                let row = $(this).closest('tr');
+                let dateRenew = row.find('.date-renew-input').val();
+                let completeButton = $(this);
+                let editButton = row.find('.edit-btn');
+                let dateInput = row.find('.date-renew-input');
 
-                // ตรวจสอบค่าก่อนส่ง
                 if (!historyId || !dateRenew) {
                     alert('กรุณากรอกข้อมูลให้ครบ');
                     return;
                 }
 
                 $.ajax({
-                    url: "{{ route('updateDateRenew') }}", // ใช้ route ที่เหมาะสม
+                    url: "{{ route('updateDateRenew') }}",
                     type: "POST",
                     data: {
-                        _token: "{{ csrf_token() }}", // ส่ง CSRF Token
-                        history_id: historyId, // ส่ง history_id ที่ถูกต้อง
-                        date_renew: dateRenew // ส่งค่า date_renew ที่เลือกจากช่อง input
+                        _token: "{{ csrf_token() }}",
+                        history_id: historyId,
+                        date_renew: dateRenew
                     },
                     success: function(response) {
                         if (response.success) {
-                            button.css({
-                                "background-color": "#ccc",
+                            completeButton.css({
+                                "background-color": "#ccc", // เปลี่ยนสีของปุ่ม "เสร็จสิ้น" เป็นสีเทา
                                 "cursor": "not-allowed"
                             }).prop("disabled", true).text("เสร็จสิ้น");
+
+                            // เปลี่ยนสีของปุ่ม "แก้ไข" กลับมาเป็นสีเหลือง
+                            editButton.prop("disabled", false).css({
+                                "opacity": "1",
+                                "background-color": "#F9D74E", // สีเหลืองที่ต้องการ
+                                "border": "none" // เอาขอบออก
+                            });
+
+                            // เปลี่ยนวันที่ให้เป็น readonly และสีเทา
+                            dateInput.prop("readonly", true).css("background-color", "#f0f0f0");
 
                             alert('วันที่ถูกบันทึกเรียบร้อยแล้ว');
                         } else {
