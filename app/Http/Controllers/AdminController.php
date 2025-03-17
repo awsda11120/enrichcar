@@ -107,6 +107,10 @@ public function storeHistory(Request $request)
         'TypeRenewTax' => $type_tax,
         'Receive' => $receive_option, // บันทึกการรับเอกสาร
         'ProofOfReceive' => null, // ยังไม่มีหลักฐานการรับ
+        'SumRenew' => $request->sum_renew,
+        'SumTax' => $request->sum_tax,
+        'SumFee' => $request->sum_fee,
+        'SumDelivery' => $request->sum_delivery,
         'SumCost' => $request->total_cost,
     ];
 
@@ -154,7 +158,10 @@ public function storeHistoryReceive(Request $request, $id)
         // อัปโหลดไฟล์
         $file = $request->file('ProofOfReceive');
         $fileName = time() . '.' . $file->getClientOriginalExtension();
-        $file->storeAs('public/proofs', $fileName);
+        // $file->storeAs('public/proofs', $fileName);
+        $file->move(public_path('public/proofs'), $fileName);
+
+        
 
         // เก็บชื่อไฟล์ในฐานข้อมูล
         DB::table('histories')->where('id', $id)->update([

@@ -47,7 +47,7 @@
                                     <input type="file" class="form-control mt-2" name="ProofOfReceive" id="proof-{{ $item->history_id }}" 
                                     {{ !empty($item->ProofOfReceive) ? 'disabled' : '' }}>
                                     <!-- ปุ่มดาวน์โหลดไฟล์จะอยู่หลังช่องเลือกไฟล์ -->
-                                    <a href="{{ asset('storage/proofs/' . $item->ProofOfReceive) }}"
+                                    <a href="{{ asset('public/proofs/' . $item->ProofOfReceive) }}"
                                         class="btn btn-info btn-sm mt-2" style="background-color: #A2D7FF; border: none;"
                                         download>
                                         ดาวน์โหลด
