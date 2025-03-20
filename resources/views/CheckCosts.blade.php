@@ -3,6 +3,18 @@
 @section('content')
     <div class="container my-5">
         <h3 class="text-center mb-4">ตรวจสอบค่าดำเนินการ</h3>
+        <style>
+            .disabled-btn {
+                background-color: #d3d3d3 !important; /* สีทึบ */
+                cursor: not-allowed;
+                border: none; /* ลบกรอบ */
+            }
+        
+            .disabled-btn:disabled {
+                opacity: 0.6; /* ทำให้ปุ่มดูจางลง */
+            }
+        </style>
+        
 
         <div class="row justify-content-center mb-4">
             <div class="col-md-8">
@@ -72,7 +84,11 @@
                     <input type="hidden" name="calculateRenew" value="{{ $calculateRenew ? 1 : 0 }}">
                     <input type="hidden" name="receive_option" value="{{ $data->SelectOption }}">
                     <input type="hidden" name="total_cost" value="{{ $sum_cost }}">
-                    <button type="submit" class="btn my-3" style="background-color:#A4F02A">ดำเนินการ</button>
+                    <input type="hidden" name="sum_renew" value="{{ $sum_renew }}">
+                    <input type="hidden" name="sum_tax" value="{{ $sum_tax }}">
+                    <input type="hidden" name="sum_fee" value="{{ $sum_fee }}">
+                    <input type="hidden" name="sum_delivery" value="{{ $sum_delivery }}">
+                    <button type="submit" class="btn my-3 {{ $sum_cost == 0 ? 'disabled-btn' : '' }}" style="background-color:#A4F02A" {{ $sum_cost == 0 ? 'disabled' : '' }}>ดำเนินการ</button>
                 </form>
             </div>
         </div>

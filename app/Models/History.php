@@ -15,6 +15,10 @@ class History extends Model
         'TypeRenewTax',
         'Receive',
         'ProofOfReceive',
+        'SumRenew',
+        'SumTax',
+        'SumFee',
+        'SumDelivery',
         'SumCost'
     ];
 }

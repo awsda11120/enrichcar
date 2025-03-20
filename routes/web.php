@@ -50,6 +50,8 @@ Route::post('CheckCosts/{id}/{typeRenew?}', [CalculateController::class, 'CalCos
 Route::get('InsView',[AdminController::class,'InsView']);
 Route::get('/history/{id}',[AdminController::class,'storeHistory'])->name('history');
 Route::get('/ShowHis',[AdminController::class,'showHis']);
+Route::get('/sum', [ChartController::class, 'CarChart'])->name('sum');
+Route::get('/getChartData', [ChartController::class, 'getChartData']);
 Route::get('/receive',[AdminController::class,'showReceive']);
 Route::get('/sum', [ChartController::class, 'CarChart']);
 Route::get('/receive', [AdminController::class, 'showReceive'])->name('receiveStore');
@@ -63,3 +65,6 @@ Route::post('/history/update/{id}', [AdminController::class, 'storeHistoryReceiv
 // Route::get('/upload/{filename}', function ($filename) {
 //     return response()->file(storage_path('upload\doc' . $filename));
 // });
+
+Route::get('/summary', [ChartController::class, 'index'])->name('summary');
+Route::get('/getChartData', [ChartController::class, 'getChartData']);

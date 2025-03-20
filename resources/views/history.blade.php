@@ -4,23 +4,14 @@
 
     <div class="row">
         <div class="col-md-2 ">
-            <label for="CustomerName" class="form-label fs-5">ประวัติการดำเนินการ</label>
+            <label for="CustomerName" class="form-label fs-5">ต้นหาเลขทะเบียนรถ</label>
         </div>
-        <div class="col-md-1 ">
-            <label for="CustomerName" class="form-label fs-5">จาก</label>
-        </div>
-        <div class="col-md-3 ">
-            <input type="text" class="form-control datepicker" name="RegistrationDate" readonly>
-        </div>
-        <div class="col-md-1 ">
-            <label for="CustomerName" class="form-label fs-5">ถึง</label>
-        </div>
-        <div class="col-md-3 ">
-            <input type="text" class="form-control datepicker" name="RegistrationDate" readonly>
-        </div>
-        <div class="col-md-2 ">
-            <span><a href="#" class="btn mx-2" style="background-color:#F7CBC7">ค้นหา</a></span>
-        </div>
+        <form class="d-flex col-md-2 " role="search">
+            <input id="searchInput" class="form-control me-2" type="search" aria-label="Search"
+                placeholder="ค้นหาเลขทะเบียน...">
+
+        </form>
+
     </div>
     <hr>
     <table class="table table-grid">
@@ -181,6 +172,15 @@
                         console.error(xhr.responseText);
                         alert("เกิดข้อผิดพลาดในการส่งข้อมูลไปยังเซิร์ฟเวอร์");
                     }
+                });
+            });
+            $(document).ready(function() {
+                $("#searchInput").on("keyup", function() {
+                    let value = $(this).val().toLowerCase();
+                    $("table tbody tr").filter(function() {
+                        $(this).toggle($(this).find("td:nth-child(2)").text().toLowerCase()
+                            .indexOf(value) > -1);
+                    });
                 });
             });
         });

@@ -6,9 +6,7 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
+
     public function up(): void
     {
         Schema::create('histories', function (Blueprint $table) {
@@ -19,6 +17,10 @@ return new class extends Migration
             $table->integer('TypeRenewTax')->nullable();
             $table->string('Receive');
             $table->string('ProofOfReceive')->nullable();
+            $table->integer('SumRenew');
+            $table->integer('SumTax');
+            $table->integer('SumFee');
+            $table->integer('SumDelivery');
             $table->integer('SumCost');
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
@@ -26,9 +28,6 @@ return new class extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('histories');

@@ -18,8 +18,9 @@
     <link rel="stylesheet" href="//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">
     <script src="//code.jquery.com/jquery-1.10.2.js"></script>
     <script src="//code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
-
     
+
+
 
 
     <style>
@@ -134,28 +135,6 @@
             margin: 0;
         }
 
-        /* td:not(.custom-color) {
-            background-color: white;
-        } */
-
-        /* .ins-red {
-            background-color: #FFCCCC !important;
-        }
-
-
-        .ins-yellow {
-            background-color: #FFFF99 !important;
-        }
-
-
-        .tax-red {
-            background-color: #FFCCCC !important;
-        }
-
-
-        .tax-yellow {
-            background-color: #FFFF99 !important;
-        } */
 
 
 
@@ -190,30 +169,6 @@
 
 
 
-        /*
-        .exp {
-            background-color: gray !important;
-        }
-        .ins_danger td {
-            background:#ccb5e2!important;
-            color:#000;
-        }
-        .ins_warning td {
-            background:#63f3c1!important;
-            color:#000;
-        } */
-
-        /* .bg_danger {
-    background-color: red !important;
-}
-
-.bg_warning {
-    background-color: yellow !important;
-}
-
-.exp {
-    background-color: gray !important;
-} */
 
         table.table-grid,
         table.table-grid thead tr th,
@@ -251,6 +206,10 @@
                 float: none;
             }
         }
+
+
+
+
     </style>
     <script>
         $(function() {
@@ -258,10 +217,13 @@
                 changeMonth: true,
                 changeYear: true,
                 showButtonPanel: true,
-                dateFormat: 'yy-mm-dd'
+                dateFormat: 'yy-mm-dd',
+                yearRange: "1800:+0", // กำหนดให้เลือกปีได้ตั้งแต่ 1900 จนถึงปีปัจจุบัน
+                minDate: new Date(1900, 0, 1) // กำหนดให้เลือกวันที่ย้อนกลับไปได้ถึงปี 1900
             });
         });
     </script>
+
 </head>
 
 <body style="background-color: #FDF5F4;">
@@ -280,12 +242,12 @@
             <div class="sidebar">
                 <a href="/info" class="{{ request()->is('info') ? 'active' : '' }}"><i class="bi bi-car-front"></i>
                     ข้อมูล</a>
-                <a href="/ShowHis" class="{{ request()->is('showHis') ? 'active' : '' }}"><i
+                <a href="/ShowHis" class="{{ request()->is('ShowHis') ? 'active' : '' }}"><i
                         class="bi bi-clock-history"></i> ประวัติทำรายการ</a>
                 <a href="/receive" class="{{ request()->is('receive') ? 'active' : '' }}"><i class="bi bi-box-seam"></i>
                     การรับเอกสาร</a>
                 <a href="/sum" class="{{ request()->is('sum') ? 'active' : '' }}"><i
-                        class="bi bi-bar-chart-line-fill"></i> สรุปขข้อมูล</a>
+                        class="bi bi-bar-chart-line-fill"></i> สรุปข้อมูล</a>
                 <a href="/settings/general" class="{{ request()->is('settings/general') ? 'active' : '' }}"><i
                         class="bi bi-gear-wide-connected"></i> ตั้งค่าทั่วไป</a>
                 <a href="/settings/cost" class="{{ request()->is('settings/cost') ? 'active' : '' }}"><i
