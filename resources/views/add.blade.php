@@ -83,8 +83,8 @@
                                 <label for="CarCity" class="form-label">จังหวัด</label>
                                 <select name="CarCity" class="form-select">
                                     <option selected>เลือก...</option>
-                                    @foreach ($prov as $item )
-                                        <option value="{{$item->name}}"> {{$item->name}}</option>
+                                    @foreach ($prov as $item)
+                                        <option value="{{ $item->name }}"> {{ $item->name }}</option>
                                     @endforeach
                                 </select>
                                 @error('CarCity')
@@ -124,8 +124,8 @@
                                 <label for="InsuranceType" class="form-label">ประเภท พ.ร.บ.</label>
                                 <select name="InsuranceType" class="form-select">
                                     <option selected>เลือก...</option>
-                                    @foreach ($sett["type"] as $item )
-                                        <option value="{{$item->name}}"> {{$item->name}}</option>
+                                    @foreach ($sett['type'] as $item)
+                                        <option value="{{ $item->name }}"> {{ $item->name }}</option>
                                     @endforeach
                                 </select>
                                 @error('InsuranceType')
@@ -138,8 +138,8 @@
                                 <label for="TaxType" class="form-label">ประเภทภาษี</label>
                                 <select name="TaxType" class="form-select">
                                     <option selected>เลือก...</option>
-                                    @foreach ($tax as $item )
-                                        <option value="{{$item->name}}"> {{$item->name}}</option>
+                                    @foreach ($tax as $item)
+                                        <option value="{{ $item->name }}"> {{ $item->name }}</option>
                                     @endforeach
                                 </select>
                                 @error('TaxType')
@@ -154,7 +154,7 @@
                                 <label for="CarBrand" class="form-label">ยี่ห้อ</label>
                                 <select name="CarBrand" class="form-select">
                                     <option selected>เลือก...</option>
-                                    @foreach ($sett["brand"] as $item )
+                                    @foreach ($sett['brand'] as $item)
                                         <option value="{{$item->name}}"> {{$item->name}}</option>
                                     @endforeach
                                 </select>
@@ -204,11 +204,11 @@
                                 <label for="SelectOption" class="form-label">การรับเอกสาร</label>
                                 <select name="SelectOption" class="form-select">
                                     <option selected>เลือก...</option>
-                                        <option>มารับเอง</option>
-                                        <option>จัดส่งตามที่อยู่</option>
+                                    <option>มารับเอง</option>
+                                    <option>จัดส่งตามที่อยู่</option>
                                 </select>
                                 {{-- <label for="SelectOption" class="form-label">การรับเอกสาร</label>
-                                <input type="text" class="form-control" name="SelectOption">--}}
+                                <input type="text" class="form-control" name="SelectOption"> --}}
                                 @error('SelectOption')
                                     <div class="my-1">
                                         <span class="text-danger">{{ $message }}</span>
@@ -239,7 +239,7 @@
                 <div class="errMsg">
                     <ul>
                         @foreach ($errors as $error)
-                            <li>{{$error}}</li>
+                            <li>{{ $error }}</li>
                         @endforeach
                     </ul>
                 </div>
@@ -250,4 +250,20 @@
             </div>
         </form>
     </div>
+    {{-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            document.querySelectorAll(".datepicker").forEach(input => {
+                if (!input._flatpickr) { // ตรวจสอบว่า Flatpickr ถูกใช้กับอินพุตนี้ไปแล้วหรือยัง
+                    flatpickr(input, {
+                        dateFormat: "Y-m-d",
+                        maxDate: "today"
+                    });
+                }
+            });
+        });
+        
+    </script> --}}
+    
 @endsection

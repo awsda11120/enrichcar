@@ -211,17 +211,20 @@
 
 
     </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
-        $(function() {
-            $(".datepicker").datepicker({
-                changeMonth: true,
-                changeYear: true,
-                showButtonPanel: true,
-                dateFormat: 'yy-mm-dd',
-                yearRange: "1800:+0", // กำหนดให้เลือกปีได้ตั้งแต่ 1900 จนถึงปีปัจจุบัน
-                minDate: new Date(1900, 0, 1) // กำหนดให้เลือกวันที่ย้อนกลับไปได้ถึงปี 1900
+        document.addEventListener("DOMContentLoaded", function() {
+            document.querySelectorAll(".datepicker").forEach(input => {
+                if (!input._flatpickr) { // ตรวจสอบว่า Flatpickr ถูกใช้กับอินพุตนี้ไปแล้วหรือยัง
+                    flatpickr(input, {
+                        dateFormat: "Y-m-d",
+                        maxDate: "today"
+                    });
+                }
             });
         });
+        
     </script>
 
 </head>

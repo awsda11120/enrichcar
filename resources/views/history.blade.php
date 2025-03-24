@@ -90,11 +90,11 @@
                 }
             });
 
-            $(".datepicker").datepicker({
-                format: "yyyy-mm-dd",
-                autoclose: true,
-                todayHighlight: true
-            });
+            // $(".datepicker").datepicker({
+            //     format: "yyyy-mm-dd",
+            //     autoclose: true,
+            //     todayHighlight: true
+            // });
 
             // คลิกปุ่ม "แก้ไข"
             $('.edit-btn').click(function() {

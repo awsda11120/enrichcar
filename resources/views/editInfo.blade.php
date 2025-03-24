@@ -5,7 +5,8 @@
         แก้ไขข้อมูล
     </h3>
     <div class="container py-4 ">
-        <form method="POST" action="{{ route('updateInfo', ['id' => $list->id]) }}" id="editInfo" enctype="multipart/form-data">
+        <form method="POST" action="{{ route('updateInfo', ['id' => $list->id]) }}" id="editInfo"
+            enctype="multipart/form-data">
             @csrf
             <div class="row ms-auto justify-content-center">
                 <div class="col-md-9">
@@ -77,7 +78,7 @@
                             <div class="col-md-3">
                                 <label for="CarNumber" class="form-label">เลขทะเบียน</label>
                                 <input type="text" class="form-control" name="CarNumber" class="form-control"
-                                    value="{{ Str::before($list->CarNumber, ' ')}}">
+                                    value="{{ Str::before($list->CarNumber, ' ') }}">
                                 @error('CarNumber')
                                     <div class="my-1">
                                         <span class="text-danger">{{ $message }}</span>
@@ -218,4 +219,18 @@
             </div>
         </form>
     </div>
+    {{-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            document.querySelectorAll(".datepicker").forEach(input => {
+                if (!input._flatpickr) { // ตรวจสอบว่า Flatpickr ถูกใช้กับอินพุตนี้ไปแล้วหรือยัง
+                    flatpickr(input, {
+                        dateFormat: "Y-m-d",
+                        maxDate: "today"
+                    });
+                }
+            });
+        });
+    </script> --}}
 @endsection
