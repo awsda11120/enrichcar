@@ -33,14 +33,14 @@ class ChartController extends Controller
         $InsCostChart = Car::join('histories', 'cars.id', '=', 'histories.CarId')
                             ->where('histories.TypeRenewIns', 1)  // เงื่อนไขการต่อ พ.ร.บ.
                             ->where('histories.status', 1)        // กรองเฉพาะ status = 1
-                            ->selectRaw('cars.InsuranceType, SUM(histories.SumCost) as total_costIns')
+                            ->selectRaw('cars.InsuranceType, SUM(histories.SumFee) as total_costIns')
                             ->groupBy('cars.InsuranceType')
                             ->get();
 
         $TaxCostChart = Car::join('histories', 'cars.id', '=', 'histories.CarId')
                             ->where('histories.TypeRenewTax', 1)  // เงื่อนไขการต่อภาษี
                             ->where('histories.status', 1)        // กรองเฉพาะ status = 1
-                            ->selectRaw('cars.TaxType, SUM(histories.SumCost) as total_costTax')
+                            ->selectRaw('cars.TaxType, SUM(histories.SumFee) as total_costTax')
                             ->groupBy('cars.TaxType')
                             ->get();
 
@@ -60,57 +60,59 @@ class ChartController extends Controller
 
     public function getChartData(Request $request)
 {
-     // ตรวจสอบวันที่ที่ได้รับ
-     $startDate = $request->query('start_date');
-     $endDate = $request->query('end_date');
- 
-     if (!$startDate || !$endDate) {
-         return response()->json(['error' => 'Invalid date range'], 400);
-     }
- 
-     // ลองตรวจสอบว่าเป็นวันที่หรือไม่
-     try {
-         $startDate = Carbon::parse($startDate)->format('Y-m-d');
-         $endDate = Carbon::parse($endDate)->format('Y-m-d');
-     } catch (\Exception $e) {
-         return response()->json(['error' => 'Invalid date format'], 400);
-     }
+    $startMonth = $request->input('start_month'); // รูปแบบ 'yyyy-mm'
+    $endMonth   = $request->input('end_month');     // รูปแบบ 'yyyy-mm'
 
-    // คิวรีข้อมูลอื่นๆ และส่งกลับเป็น JSON
-    $insuranceData = DB::table('histories')
-    ->join('cars', 'histories.CarId', '=', 'cars.id')
-    ->whereBetween(DB::raw('DATE(histories.DateRenew)'), [$startDate, $endDate])
-    ->where('histories.TypeRenewIns', 1)
-    ->where('histories.status', 1)
-    ->groupBy('cars.InsuranceType')
-    ->selectRaw('cars.InsuranceType, COUNT(*) as total')
-    ->get();
+    if ($startMonth && $endMonth) {
+        // กรองข้อมูลตามช่วงเดือนที่เลือก
+        $startDate = \Carbon\Carbon::createFromFormat('Y-m', $startMonth)->startOfMonth();
+        $endDate   = \Carbon\Carbon::createFromFormat('Y-m', $endMonth)->endOfMonth();
 
-dd($insuranceData);  // ตรวจสอบข้อมูลที่ได้รับ
+        $insuranceData = \DB::table('histories')
+            ->join('cars', 'histories.CarId', '=', 'cars.id')
+            ->whereBetween('histories.DateRenew', [$startDate, $endDate])
+            ->where('histories.TypeRenewIns', 1)
+            ->where('histories.status', 1)
+            ->groupBy('cars.InsuranceType')
+            ->selectRaw('cars.InsuranceType as type, COUNT(*) as total, SUM(histories.SumFee) as totalFee')
+            ->get();
 
+        $taxData = \DB::table('histories')
+            ->join('cars', 'histories.CarId', '=', 'cars.id')
+            ->whereBetween('histories.DateRenew', [$startDate, $endDate])
+            ->where('histories.TypeRenewTax', 1)
+            ->where('histories.status', 1)
+            ->groupBy('cars.TaxType')
+            ->selectRaw('cars.TaxType as type, COUNT(*) as total, SUM(histories.SumFee) as totalFee')
+            ->get();
+    } else {
+        // ถ้าไม่มีการเลือกเดือน (แสดงข้อมูลทั้งหมด)
+        $insuranceData = \DB::table('histories')
+            ->join('cars', 'histories.CarId', '=', 'cars.id')
+            ->where('histories.TypeRenewIns', 1)
+            ->where('histories.status', 1)
+            ->groupBy('cars.InsuranceType')
+            ->selectRaw('cars.InsuranceType as type, COUNT(*) as total, SUM(histories.SumFee) as totalFee')
+            ->get();
 
-    $taxData = DB::table('histories')
-        ->join('cars', 'histories.CarId', '=', 'cars.id')
-        ->whereBetween(DB::raw('DATE(histories.DateRenew)'), [$startDate, $endDate])
-        ->where('histories.TypeRenewTax', 1)
-        ->where('histories.status', 1)
-        ->groupBy('cars.TaxType')
-        ->selectRaw('cars.TaxType, COUNT(*) as total')
-        ->get();
+        $taxData = \DB::table('histories')
+            ->join('cars', 'histories.CarId', '=', 'cars.id')
+            ->where('histories.TypeRenewTax', 1)
+            ->where('histories.status', 1)
+            ->groupBy('cars.TaxType')
+            ->selectRaw('cars.TaxType as type, COUNT(*) as total, SUM(histories.SumFee) as totalFee')
+            ->get();
+    }
 
-    // ส่งข้อมูลที่ได้รับไปยัง Frontend
-    return response()->json(['success' => 'Data retrieved successfully']);
     return response()->json([
-        'insurance' => [
-            'labels' => $insuranceData->pluck('InsuranceType'),
-            'data' => $insuranceData->pluck('total'),
-        ],
-        'tax' => [
-            'labels' => $taxData->pluck('TaxType'),
-            'data' => $taxData->pluck('total'),
-        ]
+        'insurance' => $insuranceData,
+        'tax'       => $taxData
     ]);
 }
+
+    
+
+
 
     
 

@@ -22,7 +22,7 @@
                 <th scope="col">พ.ร.บ.</th>
                 <th scope="col">ภาษี</th>
                 <th scope="col">การรับเอกสาร</th>
-                <th scope="col">ดาวน์โหลด</th>
+                <th scope="col">สำเนาเล่มทะเบียนรถ</th>
                 <th scope="col">สถานะ</th>
             </tr>
         </thead>
