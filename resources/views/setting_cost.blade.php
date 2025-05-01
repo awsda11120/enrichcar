@@ -43,8 +43,8 @@
             <tr>
                 <th scope="col">ลำดับ</th>
                 <th scope="col">ประเภทรถ</th>
-                <th scope="col">ค่าต่อพ.ร.บ.</th>
-                <th scope="col">อัตราค่าบริการ</th>
+                <th scope="col">ค่าต่อ พ.ร.บ.</th>
+                <th scope="col">ค่าบริการ</th>
                 <th scope="col">ค่าจัดส่ง</th>
                 <th scope="col" width="60">ลบ</th>
             </tr>
@@ -60,7 +60,7 @@
                     <td>
                         <a href="{{ route('deleteCost', $item->id) }}" class="btn btn-outline-danger"
                             onclick="return confirm('คุณต้องการลบข้อมูลลำดับที่ {{ $index+1 }} {{ $item->name }} หรือไม่ ?')">
-                            <i class="bi bi-x-lg"></i>
+                            <i class="bi bi-trash-fill"></i>
                         </a>
                     </td>
                 </tr>

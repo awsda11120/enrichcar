@@ -7,7 +7,24 @@
                 <div class="col-12">
                     <h4>กราฟแสดงจำนวนรถที่ต่อ พ.ร.บ. และภาษี (แยกตามประเภท)</h4>
                 </div>
-                <!-- ช่องเลือกสำหรับช่วงเริ่มต้น -->
+
+                @php
+                    $monthNames = [
+                        '01' => 'มกราคม',
+                        '02' => 'กุมภาพันธ์',
+                        '03' => 'มีนาคม',
+                        '04' => 'เมษายน',
+                        '05' => 'พฤษภาคม',
+                        '06' => 'มิถุนายน',
+                        '07' => 'กรกฎาคม',
+                        '08' => 'สิงหาคม',
+                        '09' => 'กันยายน',
+                        '10' => 'ตุลาคม',
+                        '11' => 'พฤศจิกายน',
+                        '12' => 'ธันวาคม',
+                    ];
+                @endphp
+
                 <div class="col-md-6">
                     <div class="row">
                         <div class="col-6">
@@ -23,14 +40,14 @@
                             <label for="startMonth">เลือกเดือนเริ่มต้น</label>
                             <select id="startMonth" class="form-control">
                                 <option value="">เลือกเดือน</option>
-                                @for ($m = 1; $m <= 12; $m++)
-                                    <option value="{{ sprintf('%02d', $m) }}">{{ sprintf('%02d', $m) }}</option>
-                                @endfor
+                                @foreach ($monthNames as $num => $name)
+                                    <option value="{{ $num }}">{{ $name }}</option>
+                                @endforeach
                             </select>
                         </div>
                     </div>
                 </div>
-                <!-- ช่องเลือกสำหรับช่วงสิ้นสุด -->
+
                 <div class="col-md-6">
                     <div class="row">
                         <div class="col-6">
@@ -46,14 +63,14 @@
                             <label for="endMonth">เลือกเดือนสิ้นสุด</label>
                             <select id="endMonth" class="form-control">
                                 <option value="">เลือกเดือน</option>
-                                @for ($m = 1; $m <= 12; $m++)
-                                    <option value="{{ sprintf('%02d', $m) }}">{{ sprintf('%02d', $m) }}</option>
-                                @endfor
+                                @foreach ($monthNames as $num => $name)
+                                    <option value="{{ $num }}">{{ $name }}</option>
+                                @endforeach
                             </select>
                         </div>
                     </div>
                 </div>
-                <!-- ปุ่มตกลง -->
+
                 <div class="col-12 mt-3">
                     <button id="applyDateRange" class="btn btn-primary">ตกลง</button>
                 </div>
@@ -61,6 +78,7 @@
         </div>
 
         <hr>
+
         <div class="row" id="chartContainer">
             <div class="col-md-8 mb-5">
                 <h5>กราฟการต่อ พ.ร.บ. แยกตามประเภท</h5>
@@ -77,19 +95,14 @@
         </div>
     </div>
 
-    <!-- นำเข้า jQuery และ Chart.js -->
+    <!-- jQuery และ Chart.js -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"
-        integrity="sha512-JPcRR8yFa8mmCsfrw4TNte1ZvF1e3+1SdGMslZvmrzDYxS69J7J49vkFL8u6u8PlPJK+H3voElBtUCzaXj+6ig=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
     <script>
         var myChartInsurance, myChartTax, myChartPie;
 
         $(document).ready(function() {
-            // เมื่อโหลดหน้าแรกให้แสดงข้อมูลทั้งหมด (ไม่มีการ filter)
             fetchData('', '');
 
             $('#applyDateRange').on('click', function() {
@@ -103,12 +116,8 @@
                     return;
                 }
 
-                // รวมปีและเดือนเข้าด้วยกันเป็นรูปแบบ yyyy-mm
                 var startDateParam = startYear + '-' + startMonth;
                 var endDateParam = endYear + '-' + endMonth;
-
-                console.log('Start Date Param:', startDateParam);
-                console.log('End Date Param:', endDateParam);
 
                 fetchData(startDateParam, endDateParam);
             });
@@ -117,13 +126,12 @@
         function fetchData(startMonth, endMonth) {
             var url = '/getChartData';
             if (startMonth && endMonth) {
-                url += `?start_month=${startMonth}&end_month=${endMonth}`;
+                url += '?start_month=' + startMonth + '&end_month=' + endMonth; // แก้ไข
             }
             $.ajax({
                 url: url,
                 method: 'GET',
                 success: function(data) {
-                    console.log('Data received from backend:', data);
                     if ((!data.insurance || data.insurance.length === 0) &&
                         (!data.tax || data.tax.length === 0)) {
                         alert('ไม่พบข้อมูลในช่วงเวลาที่เลือก');
@@ -138,7 +146,6 @@
         }
 
         function updateCharts(data) {
-            // สำหรับกราฟ พ.ร.บ.
             var insuranceLabels = data.insurance.map(item => item.type);
             var insuranceCounts = data.insurance.map(item => item.total);
 
@@ -158,22 +165,37 @@
                 },
                 options: {
                     scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'ประเภทรถ',
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        },
                         y: {
                             beginAtZero: true,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'จำนวนรถ (คัน)',
+                                font: {
+                                    size: 14
+                                }
+                            },
                             ticks: {
-                                autoSkip: true, // บังคับให้ Chart.js ข้ามค่าที่ไม่จำเป็น
-                                precision: 0, // ให้แสดงเฉพาะเลขจำนวนเต็ม
+                                autoSkip: true,
+                                precision: 0,
                                 callback: function(value) {
-                                    return Number(value).toFixed(0) + ' คัน'; // ป้องกันการแสดงเลขซ้ำ
+                                    return Number(value).toFixed(0);
                                 }
                             }
                         }
                     }
                 }
-
             });
 
-            // สำหรับกราฟ ภาษี
             var taxLabels = data.tax.map(item => item.type);
             var taxCounts = data.tax.map(item => item.total);
 
@@ -193,22 +215,37 @@
                 },
                 options: {
                     scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'ประเภทรถ',
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        },
                         y: {
                             beginAtZero: true,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'จำนวนรถ (คัน)',
+                                font: {
+                                    size: 14
+                                }
+                            },
                             ticks: {
-                                autoSkip: true, // บังคับให้ Chart.js ข้ามค่าที่ไม่จำเป็น
-                                precision: 0, // ให้แสดงเฉพาะเลขจำนวนเต็ม
+                                autoSkip: true,
+                                precision: 0,
                                 callback: function(value) {
-                                    return Number(value).toFixed(0) + ' คัน'; // ป้องกันการแสดงเลขซ้ำ
+                                    return Number(value).toFixed(0);
                                 }
                             }
                         }
                     }
                 }
-
             });
 
-            // สำหรับ Pie Chart แสดงรายได้รวมจาก SumFee
             var totalInsuranceFee = data.insurance.reduce((sum, item) => sum + parseFloat(item.totalFee), 0);
             var totalTaxFee = data.tax.reduce((sum, item) => sum + parseFloat(item.totalFee), 0);
 

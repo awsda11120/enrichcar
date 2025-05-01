@@ -19,7 +19,8 @@ return new class extends Migration
             $table->string('ProofOfReceive')->nullable();
             $table->integer('SumRenew');
             $table->integer('SumTax');
-            $table->integer('SumFee');
+            $table->integer('InsIncome');
+            $table->integer('TaxIncome');
             $table->integer('SumDelivery');
             $table->integer('SumCost');
             $table->timestamp('created_at')->useCurrent();

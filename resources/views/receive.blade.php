@@ -39,13 +39,14 @@
                             @if ($item->SelectOption == 'จัดส่งตามที่อยู่')
                                 <input type="text" class="form-control" name="ProofOfReceive"
                                     value="{{ old('ProofOfReceive', $item->ProofOfReceive) }}"
-                                    placeholder="กรุณากรอกเลขพัสดุ" id="proof-{{ $item->history_id }}" 
+                                    placeholder="กรุณากรอกเลขพัสดุ" id="proof-{{ $item->history_id }}"
                                     {{ !empty($item->ProofOfReceive) ? 'disabled' : '' }}>
                             @elseif ($item->SelectOption == 'มารับเอง')
                                 @if (!empty($item->ProofOfReceive))
                                     <!-- ช่องเลือกไฟล์ -->
-                                    <input type="file" class="form-control mt-2" name="ProofOfReceive" id="proof-{{ $item->history_id }}" 
-                                    {{ !empty($item->ProofOfReceive) ? 'disabled' : '' }}>
+                                    <input type="file" class="form-control mt-2" name="ProofOfReceive"
+                                        id="proof-{{ $item->history_id }}"
+                                        {{ !empty($item->ProofOfReceive) ? 'disabled' : '' }}>
                                     <!-- ปุ่มดาวน์โหลดไฟล์จะอยู่หลังช่องเลือกไฟล์ -->
                                     <a href="{{ asset('public/proofs/' . $item->ProofOfReceive) }}"
                                         class="btn btn-info btn-sm mt-2" style="background-color: #A2D7FF; border: none;"
@@ -55,8 +56,9 @@
                                     <span class="mt-2">{{ $item->ProofOfReceive }}</span>
                                 @else
                                     <!-- ช่องเลือกไฟล์ -->
-                                    <input type="file" class="form-control" name="ProofOfReceive" id="proof-{{ $item->history_id }}" 
-                                    {{ !empty($item->ProofOfReceive) ? 'disabled' : '' }}>
+                                    <input type="file" class="form-control" name="ProofOfReceive"
+                                        id="proof-{{ $item->history_id }}"
+                                        {{ !empty($item->ProofOfReceive) ? 'disabled' : '' }}>
                                 @endif
                             @endif
                         </td>
@@ -68,7 +70,9 @@
                                 บันทึก
                             </button>
                             <button type="button" class="btn btn-warning btn-sm edit-btn"
-                                data-id="{{ $item->history_id }}" style="background-color: #F9D74E; border: none;">
+                                data-id="{{ $item->history_id }}"
+                                style="background-color: {{ !empty($item->ProofOfReceive) ? '#F9D74E' : '#ccc' }}; border: none;"
+                                {{ empty($item->ProofOfReceive) ? 'disabled' : '' }}>
                                 แก้ไข
                             </button>
                         </td>
@@ -110,7 +114,8 @@
             $('.edit-btn').click(function() {
                 var row = $(this).closest('tr'); // ค้นหาแถวที่ปุ่มถูกกด
                 var submitButton = row.find('.save-btn'); // ค้นหาปุ่มบันทึกในแถวเดียวกัน
-                var proofInput = row.find('input[name="ProofOfReceive"]'); // ค้นหาช่องกรอกข้อมูลในแถวเดียวกัน
+                var proofInput = row.find(
+                'input[name="ProofOfReceive"]'); // ค้นหาช่องกรอกข้อมูลในแถวเดียวกัน
                 var editButton = row.find('.edit-btn'); // ค้นหาปุ่มแก้ไขในแถวเดียวกัน
 
                 // เปิดใช้งานปุ่มบันทึก และเปลี่ยนเป็นสีเขียว

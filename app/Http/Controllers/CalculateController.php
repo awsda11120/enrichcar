@@ -46,13 +46,16 @@ class CalculateController extends Controller
     $discountAmount = 0;
 
     if ($calculateTax) {
-        if ($tax == 1) { // คำนวณภาษีจาก CC
+        if ($tax == 1) { // รถยนต์นั่งส่วนบุคคลไม่เกิน 7 คน
             if ($cc >= 1801) {
                 $original_tax = (600 * 0.5) + ((1800 - 600) * 1.5) + (($cc - 1800) * 4);
             } else if ($cc <= 1800) {
                 $original_tax = (600 * 0.5) + (($cc - 600) * 1.5);
             }
-        } else if ($tax == 2) { // คำนวณภาษีจากน้ำหนัก
+        }else if ($tax == 2) { // รถยนต์นั่งส่วนบุคคลเกิน 7 คน
+            $original_tax = ($weight <= 1800) ? 1300 : 1600;
+
+        } else if ($tax == 3) { // รถยนต์บรรทุกส่วนบุคคล
             $original_tax = match (true) {
                 $weight <= 500 => 300,
                 $weight <= 750 => 450,
@@ -64,9 +67,7 @@ class CalculateController extends Controller
                 $weight <= 2500 => 1650,
                 default => 1950,
             };
-        } else if ($tax == 3) { // ประเภทรถบรรทุก
-            $original_tax = ($weight <= 1800) ? 1300 : 1600;
-        }
+        } 
 
         // คำนวณส่วนลด
         $sum_tax = $original_tax;
@@ -81,18 +82,19 @@ class CalculateController extends Controller
         $sum_renew = $calculateRenew ? $renew_cost : 0;
 
         // คำนวณค่าบริการ
-        $sum_fee = ($calculateTax && $calculateRenew) ? ($fee * 2) : ($calculateTax || $calculateRenew ? $fee : 0);
+        $TaxIncome = $calculateTax ? $fee : 0;
+        $InsIncome = $calculateRenew ? $fee : 0;
 
         // คำนวณค่าจัดส่ง (มีค่าจัดส่งถ้ามีการต่ออายุ)
         $sum_delivery = ($calculateTax || $calculateRenew) ? $delivery_cost : 0;
 
         // รวมยอดเงินทั้งหมด
-        $sum_cost = $sum_tax + $sum_renew + $sum_fee + $sum_delivery;
+        $sum_cost = $sum_tax + $sum_renew + $TaxIncome + $InsIncome + $sum_delivery;
 
         // $data->carYears = $carYears;
         // $data->discountAmount = $discountAmount;
         // $data->discountPercent = $discountPercent;
 
-        return view('CheckCosts', compact('carYears','original_tax','discountAmount','discountPercent','sum_tax', 'sum_renew', 'sum_fee', 'sum_delivery', 'sum_cost', 'data', 'calculateTax', 'calculateRenew'));
+        return view('CheckCosts', compact('carYears','original_tax','discountAmount','discountPercent','sum_tax', 'sum_renew', 'InsIncome', 'TaxIncome', 'sum_delivery', 'sum_cost', 'data', 'calculateTax', 'calculateRenew'));
     }
 }

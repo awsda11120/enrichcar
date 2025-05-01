@@ -17,7 +17,7 @@ class SettingsController extends Controller
     function index($category=null)
     {
         $types = [
-            "car_type" => "ประเภทรถ",
+            "car_type" => "ประเภทรถยนต์",
             "car_brand" => "ประเภทรถจักรยานยนต์"
         ];
 

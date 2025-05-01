@@ -25,7 +25,7 @@
                             @enderror
                         </div>
                         <div class="col-md-6">
-                            <label for="NationalID" class="form-label">เลขบัตรประชาชน</label>
+                            <label for="NationalID" class="form-label">หมายเลขบัตรประชาชน</label>
                             <input type="text" class="form-control" name="NationalID" class="form-control"
                                 value="{{ $list->NationalID }}">
 
@@ -45,7 +45,7 @@
                             @enderror
                         </div>
                         <div class="col-md-4">
-                            <label for="PhoneNumber" class="form-label">เบอร์โทร</label>
+                            <label for="PhoneNumber" class="form-label">เบอร์โทรศัพท์</label>
                             <input type="number" class="form-control" name="PhoneNumber" class="form-control"
                                 value="{{ $list->PhoneNumber }}">
                             @error('PhoneNumber')
@@ -159,7 +159,7 @@
                             </div>
 
                             <div class="col-md-2">
-                                <label for="CarCC" class="form-label">ขนาดกำลัง(CC)</label>
+                                <label for="CarCC" class="form-label">ขนาดกำลัง (CC)</label>
                                 <input type="text" class="form-control" name="CarCC" class="form-control"
                                     value="{{ $list->CarCC }}">
                                 @error('CarCC')
@@ -169,7 +169,7 @@
                                 @enderror
                             </div>
                             <div class="col-md-2">
-                                <label for="CarWeight" class="form-label">น้ำหนัก(ก.ก.)</label>
+                                <label for="CarWeight" class="form-label">น้ำหนักรวม (ก.ก.)</label>
                                 <input type="text" class="form-control" name="CarWeight" class="form-control"
                                     value="{{ $list->CarWeight }}">
                                 @error('CarWeight')
@@ -213,8 +213,8 @@
                     </ul>
                 </div>
                 <div class="container col-2 mx-auto">
+                    <a href="javascript:history.back()" class="btn my-3" style="background-color:#9fdffa"> กลับ</a>
                     <input type="submit" value="บันทึก" class="btn my-3" style="background-color:#A4F02A">
-                    <a href="/" class="btn btn-warning my-3" style="background-color:#F0DF2A">กลับ</a>
                 </div>
             </div>
         </form>

@@ -48,7 +48,7 @@
                     <td>
                         <a href="{{ route('deleteGeneral', $item->id) }}" class="btn btn-sm btn-outline-danger btn-del"
                             onclick="return confirm('คุณต้องการลบข้อมูลลำดับที่ {{ $index+1 }} {{ $item->name }} หรือไม่ ?')">
-                            <i class="bi bi-x-lg"></i>
+                            <i class="bi bi-trash-fill"></i>
                         </a>
                     </td>
                 </tr>

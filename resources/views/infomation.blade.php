@@ -110,8 +110,9 @@
                     </div>
 
                     <div class="d-flex justify-content-between align-items-center">
-                        <a href="/info" class="btn my-3" style="background-color:#9fdffa"> กลับ</a>
-                        <a href="{{ route('editInfo', ['id' => $list->id]) }}" class="btn my-3" style="background-color:#F0DF2A">แก้ไข</a>
+                        <a href="javascript:history.back()" class="btn my-3" style="background-color:#9fdffa"> กลับ</a>
+                        <a href="{{ route('editInfo', ['id' => $list->id]) }}" class="btn my-3"
+                            style="background-color:#F0DF2A">แก้ไข</a>
                         <button type="submit" class="btn my-3" style="background-color:#A4F02A">ดำเนินการ</button>
                     </div>
                 </form>
@@ -127,10 +128,9 @@
             let daysIns = Number("{{ $list->days_ins ?? 0 }}"); // ถ้าเป็น null จะใช้ 0
             let daysTax = Number("{{ $list->days ?? 0 }}"); // ถ้าเป็น null จะใช้ 0
 
-            console.log("daysIns:", daysIns, "daysTax:", daysTax);
-
             let renewPrb = document.querySelector('input[name="renew_prb"]');
             let renewTax = document.querySelector('input[name="renew_tax"]');
+            let submitBtn = document.querySelector('button[type="submit"]');
 
             // ตรวจสอบเงื่อนไขว่าเหลือวันมากกว่า 90 หรือไม่
             if (renewPrb && daysIns <= 90) {
@@ -144,6 +144,24 @@
             } else {
                 renewTax.disabled = true; // ถ้าเหลือวันมากกว่า 90 ให้ปิดใช้งาน
             }
+
+            // ฟังก์ชันในการเช็คสถานะของ checkbox
+            function checkCheckboxStatus() {
+                if (!renewPrb.checked && !renewTax.checked || renewPrb.disabled && renewTax.disabled) {
+                    submitBtn.disabled = true; // ปิดปุ่มเมื่อไม่มีการติ๊ก
+                    submitBtn.style.backgroundColor = '#ccc'; // เปลี่ยนสีปุ่มให้ทึบ
+                } else {
+                    submitBtn.disabled = false; // เปิดปุ่มเมื่อมีการติ๊ก
+                    submitBtn.style.backgroundColor = '#A4F02A'; // เปลี่ยนสีปุ่มให้เป็นปกติ
+                }
+            }
+
+            // ตรวจสอบสถานะเมื่อเริ่มโหลด
+            checkCheckboxStatus();
+
+            // เชื่อมโยงฟังก์ชันกับการเปลี่ยนแปลงของ checkbox
+            renewPrb.addEventListener('change', checkCheckboxStatus);
+            renewTax.addEventListener('change', checkCheckboxStatus);
         });
     </script>
 @endsection

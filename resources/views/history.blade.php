@@ -2,9 +2,10 @@
 @section('doc', 'History')
 @section('content')
 
+
     <div class="row">
         <div class="col-md-2 ">
-            <label for="CustomerName" class="form-label fs-5">ต้นหาเลขทะเบียนรถ</label>
+            <label for="CustomerName" class="form-label fs-5">ประวัติการดำเนินการ</label>
         </div>
         <form class="d-flex col-md-2 " role="search">
             <input id="searchInput" class="form-control me-2" type="search" aria-label="Search"
@@ -33,10 +34,14 @@
                         <div class="d-flex align-items-center">
                             <input type="text" class="form-control datepicker date-renew-input me-2"
                                 data-id="{{ $item->history_id }}" value="{{ $item->DateRenew }}" readonly>
-                            <button class="btn btn-warning btn-sm edit-btn" data-id="{{ $item->history_id }}"
-                                data-date="{{ $item->DateRenew }}" style="background-color: #F9D74E; border: none;">
+                                <button class="btn btn-warning btn-sm edit-btn"
+                                data-id="{{ $item->history_id }}"
+                                data-date="{{ $item->DateRenew }}"
+                                style="background-color: {{ empty($item->DateRenew) ? '#ccc' : '#F9D74E' }}; border: none;"
+                                {{ empty($item->DateRenew) ? 'disabled' : '' }}>
                                 แก้ไข
                             </button>
+                            
                         </div>
                     </td>
                     <td>{{ $item->CarNumber }}</td>

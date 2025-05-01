@@ -22,10 +22,10 @@ return new class extends Migration
             $table->string('TaxType');
             $table->string('TypeId');
             $table->string('TaxId');
-            $table->date('RegistrationDate');
             $table->string('BookOwner');
-            $table->date('TaxHistoryDate');
             $table->string('SelectOption');
+            $table->date('RegistrationDate');
+            $table->date('TaxHistoryDate');
             $table->date('InsHistoryDate');
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();

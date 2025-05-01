@@ -11,7 +11,10 @@ use Illuminate\Support\Facades\Log;
 
 class AdminController extends Controller
 {
+
     
+
+//อัปเดตข้อมูลวันที่ในหน้าประวัติการต่อ
 public function updateDateRenew(Request $request)
 {
     try {
@@ -67,7 +70,7 @@ public function updateDateRenew(Request $request)
     return view('receive',['list' => $List]);
 }
 
-
+//บันทึกข้อมูลลงฐานข้อมูล histories เมื่อกดต่อในหน้า infomation->CheckCosts
 public function storeHistory(Request $request)
 {
     $type_ins = null;
@@ -96,7 +99,9 @@ public function storeHistory(Request $request)
                          ->first();
 
     if ($existingHistory) {
-        return redirect()->route('history.index')->with('error', 'ข้อมูลนี้มีอยู่แล้วในระบบ');
+        // ลบการ redirect ออก
+        // ไม่ต้องทำการ redirect อีกต่อไป
+        return back(); // กลับไปที่หน้าปัจจุบันแทน
     }
 
     // ถ้ายังไม่มีข้อมูลซ้ำ ก็สามารถเพิ่มข้อมูลได้
@@ -108,8 +113,9 @@ public function storeHistory(Request $request)
         'Receive' => $receive_option, // บันทึกการรับเอกสาร
         'ProofOfReceive' => null, // ยังไม่มีหลักฐานการรับ
         'SumRenew' => $request->sum_renew,
-        'SumTax' => $request->sum_tax,
-        'SumFee' => $request->sum_fee,
+        'SumTax' => $request->sum_tax, 
+        'InsIncome' => $request->ins_income,
+        'TaxIncome' => $request->tax_income,
         'SumDelivery' => $request->sum_delivery,
         'SumCost' => $request->total_cost,
     ];
@@ -125,6 +131,8 @@ public function storeHistory(Request $request)
     return view('history', ['list' => $List]);
 }
 
+
+//อัปเดตข้อมูลการรับเอกสารและหลักฐานในหน้า receive
 public function storeHistoryReceive(Request $request, $id)
 {
     $data = DB::table('histories as htr')
@@ -157,11 +165,10 @@ public function storeHistoryReceive(Request $request, $id)
 
         // อัปโหลดไฟล์
         $file = $request->file('ProofOfReceive');
-        $fileName = time() . '.' . $file->getClientOriginalExtension();
+        $fileName = $file->getClientOriginalName();
         // $file->storeAs('public/proofs', $fileName);
         $file->move(public_path('public/proofs'), $fileName);
 
-        
 
         // เก็บชื่อไฟล์ในฐานข้อมูล
         DB::table('histories')->where('id', $id)->update([
@@ -190,10 +197,11 @@ public function storeHistoryReceive(Request $request, $id)
     function showReceive()
     {
         $List =  DB::table('histories as htr')
-                 ->join('cars as c','htr.CarId','=','c.id')
-                 ->join('customers as cs', 'c.CusId', '=', 'cs.id')
-                 ->select('c.CarNumber','cs.CustomerName','cs.PhoneNumber','htr.ProofOfReceive','c.SelectOption','htr.status','htr.Receive','htr.id as history_id','htr.TypeRenewIns','htr.TypeRenewTax','c.id as car_id','htr.DateRenew','c.BookOwner')
-                 ->get();
+                ->join('cars as c','htr.CarId','=','c.id')
+                ->join('customers as cs', 'c.CusId', '=', 'cs.id')
+                ->select('htr.status','c.CarNumber','cs.CustomerName','cs.PhoneNumber','htr.ProofOfReceive','c.SelectOption','htr.status','htr.Receive','htr.id as history_id','htr.TypeRenewIns','htr.TypeRenewTax','c.id as car_id','htr.DateRenew','c.BookOwner')
+                ->where('htr.status', '!=', 0) // กรองข้อมูลที่ status != 0
+                ->get();
 
         return view('receive',['list' => $List]);
     }
@@ -203,7 +211,10 @@ public function storeHistoryReceive(Request $request, $id)
 
     public function showIn($id)
 {
+    
+
     $List = DB::table('cars as c')
+        // ->leftJoin('histories as htr','c.id','=','htr.CarId')
         ->join('customers as cs', 'c.CusId', '=', 'cs.id')
         ->select('c.id','c.BookOwner', 'cs.CustomerName','cs.NationalID','cs.PhoneNumber',
             'cs.Address','c.SelectOption','c.TaxHistoryDate','c.InsHistoryDate','c.TaxId',
@@ -211,6 +222,7 @@ public function storeHistoryReceive(Request $request, $id)
         ->where('c.id', $id)
         ->first();
 
+        
     $registrationDate = Carbon::parse($List->RegistrationDate);
     $carYears = intval($registrationDate->diffInYears(Carbon::now()));
     $months = intval($registrationDate->diffInMonths(Carbon::now()) % 12); // หาจำนวนเดือน
@@ -268,7 +280,9 @@ public function storeHistoryReceive(Request $request, $id)
     // $List->days = $days;
     $List->days_ins = $days_ins;
     $List->days = $days_left; // เพิ่มการส่งค่าจำนวนวันเหลือภาษี
-    echo "<br>" . $days_ins . " => " . $days_left;
+    // $TypeRenewIns = $List->TypeRenewIns;
+    // $TypeRenewTax = $List->TypeRenewTax;
+    // echo "<br>" . $days_ins . " => " . $days_left;
 
     // ส่งไปยังหน้า view
     return view('infomation', compact('days_left','days_ins', 'days', 'carYears'), ["list" => $List]);
@@ -281,9 +295,39 @@ public function storeHistoryReceive(Request $request, $id)
     {
         try {
             $List = DB::table('cars as c')
-                     ->join('customers as cs', 'c.CusId', '=', 'cs.id')
-                     ->select('c.CarNumber', 'c.TaxHistoryDate', 'c.RegistrationDate', 'c.InsHistoryDate', 'cs.CustomerName', 'cs.PhoneNumber', 'cs.id', 'c.BookOwner', 'c.id')
-                     ->get();
+            ->join('customers as cs', 'c.CusId', '=', 'cs.id')
+            ->select(
+                'c.CarNumber',
+                'c.TaxHistoryDate',
+                'c.RegistrationDate',
+                'c.InsHistoryDate',
+                'cs.CustomerName',
+                'cs.PhoneNumber',
+                'cs.id',
+                'c.BookOwner',
+                'c.id'
+            )
+            ->get();
+
+        // ดึงสถานะ TypeRenewIns และ TypeRenewTax โดยใช้ MAX จาก histories group by CarId
+        $historyFlags = DB::table('histories')
+            ->select(
+                'CarId',
+                DB::raw('MAX(TypeRenewIns) as HasRenewIns'),
+                DB::raw('MAX(TypeRenewTax) as HasRenewTax')
+            )
+            ->groupBy('CarId')
+            ->get()
+            ->keyBy('CarId');
+
+            foreach ($List as $item) {
+                $carId = $item->id;
+            
+                $item->HasRenewIns = isset($historyFlags[$carId]) ? $historyFlags[$carId]->HasRenewIns : 0;
+                $item->HasRenewTax = isset($historyFlags[$carId]) ? $historyFlags[$carId]->HasRenewTax : 0;
+            }
+
+            
     
             // คำนวณการต่ออายุภาษีและประกัน
             foreach ($List as $index => $item) {
@@ -380,7 +424,7 @@ public function storeHistoryReceive(Request $request, $id)
             }
             
     
-            session(['total_year' => $total_year]);
+            // session(['total_year' => $total_year]);
     
             // ส่งข้อมูลไปยัง view
             // dd($List);

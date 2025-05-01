@@ -254,7 +254,7 @@
                 <a href="/settings/general" class="{{ request()->is('settings/general') ? 'active' : '' }}"><i
                         class="bi bi-gear-wide-connected"></i> ตั้งค่าทั่วไป</a>
                 <a href="/settings/cost" class="{{ request()->is('settings/cost') ? 'active' : '' }}"><i
-                        class="bi bi-cash-coin"></i> ตั้งค่าค่าบริการ</a>
+                        class="bi bi-cash-coin"></i> กำหนดค่าบริการ</a>
             </div>
         </div>
         <div class="col-10 ">

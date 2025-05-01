@@ -7,10 +7,11 @@ use App\Http\Controllers\CalculateController;
 use App\Http\Controllers\ChartController;
 use Illuminate\Support\Facades\Storage;
 
-// Route::get('/', [Admincontroller::class,'info']);
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [Admincontroller::class,'info']);
+// Route::get('/', function () {
+//     return view('welcome');
+// });
+// Route::get('/', [AdminController::class, 'info']);
 Route::get('/receive', function () {
     return view('receive');
 });
@@ -68,3 +69,5 @@ Route::post('/history/update/{id}', [AdminController::class, 'storeHistoryReceiv
 
 Route::get('/summary', [ChartController::class, 'index'])->name('summary');
 Route::get('/getChartData', [ChartController::class, 'getChartData']);
+
+Route::post('/update-status', [AdminController::class, 'updateStatus'])->name('update.status');

@@ -17,8 +17,10 @@ class History extends Model
         'ProofOfReceive',
         'SumRenew',
         'SumTax',
-        'SumFee',
+        'InsIncome',
+        'TaxIncome',
         'SumDelivery',
-        'SumCost'
+        'SumCost',
+        // 'status_check'
     ];
 }
