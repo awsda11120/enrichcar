@@ -27,6 +27,7 @@ class CalculateController extends Controller
         $regis = Carbon::parse($data->RegistrationDate);
         $carYears = intval($regis->diffInYears(Carbon::now())); // คำนวณอายุรถ
 
+        $SelectOption = $data->SelectOption;
         $tax = $data->TaxId;
         $cc = $data->CarCC;
         $weight = $data->CarWeight;
@@ -86,7 +87,8 @@ class CalculateController extends Controller
         $InsIncome = $calculateRenew ? $fee : 0;
 
         // คำนวณค่าจัดส่ง (มีค่าจัดส่งถ้ามีการต่ออายุ)
-        $sum_delivery = ($calculateTax || $calculateRenew) ? $delivery_cost : 0;
+        // $sum_delivery = ($calculateTax || $calculateRenew) ? $delivery_cost : 0;
+        $sum_delivery = ($SelectOption == 'จัดส่งตามที่อยู่') ? $delivery_cost : 0;
 
         // รวมยอดเงินทั้งหมด
         $sum_cost = $sum_tax + $sum_renew + $TaxIncome + $InsIncome + $sum_delivery;

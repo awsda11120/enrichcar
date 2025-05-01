@@ -20,8 +20,8 @@ return new class extends Migration
             $table->integer('CarCC');
             $table->string('InsuranceType');
             $table->string('TaxType');
-            $table->string('TypeId');
-            $table->string('TaxId');
+            $table->string('TypeId');// ประเภทของ พ.ร.บ.
+            $table->string('TaxId');// ประเภทของ ภาษี
             $table->string('BookOwner');
             $table->string('SelectOption');
             $table->date('RegistrationDate');

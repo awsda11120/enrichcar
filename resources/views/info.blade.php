@@ -66,7 +66,7 @@
             <td>{{ $item->CustomerName }}</td>
             <td>{{ $item->PhoneNumber }}</td>
             <td>
-                {{ $item->next_Ins }} = {{ $item->ins_days_left }}
+                {{ $item->next_Ins }}
                 @if ($item->HasRenewIns == 1 && $item->ins_days_left <= 90)
                     <span class="dot" style="background-color: #A4F02A;"></span>
                 @elseif ($item->ins_days_left <= 0)
@@ -78,7 +78,7 @@
                 @endif
             </td>
             <td>
-                {{ $item->tax_expiry_date }} = {{ $item->tax_days_left }}
+                {{ $item->tax_expiry_date }} 
                 @if ($item->HasRenewTax == 1 && $item->tax_days_left <= 90)
                     <span class="dot" style="background-color: #A4F02A;"></span>
                 @elseif ($item->tax_days_left <= 0)
@@ -114,9 +114,9 @@
                     showRow = false;
                 }
 
-                if (filterValue === 'insurance' && !(insDaysLeft <= 30)) {
+                if (filterValue === 'insurance' && !(insDaysLeft <= 90)) {
                     showRow = false;
-                } else if (filterValue === 'tax' && !(taxDaysLeft <= 30)) {
+                } else if (filterValue === 'tax' && !(taxDaysLeft <= 90)) {
                     showRow = false;
                 }
 
