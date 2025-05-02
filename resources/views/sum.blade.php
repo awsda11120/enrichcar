@@ -176,7 +176,7 @@
                         },
                         y: {
                             beginAtZero: true,
-                            max: 100,
+                            max: 50,
                             title: {
                                 display: true,
                                 text: 'จำนวนรถ (คัน)',
@@ -226,7 +226,7 @@
                         },
                         y: {
                             beginAtZero: true,
-                            max: 100,
+                            max: 50,
                             title: {
                                 display: true,
                                 text: 'จำนวนรถ (คัน)',
