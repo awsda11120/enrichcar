@@ -178,6 +178,8 @@ public function storeHistoryReceive(Request $request, $id)
 
     // รีไดเร็กต์กลับไปยังหน้าและแสดงข้อความสำเร็จ
     return redirect()->route('receiveStore')->with('success', 'ข้อมูลได้รับการบันทึกเรียบร้อยแล้ว');
+    // return redirect()->back()->with('success', 'บันทึกเรียบร้อยแล้ว');
+    // return response()->json(['success' => true]);
 }
 
 

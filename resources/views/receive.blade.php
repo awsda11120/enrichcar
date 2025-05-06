@@ -99,6 +99,7 @@
                     return false;
                 }
 
+
                 // ปิดใช้งานปุ่มบันทึก และเปลี่ยนเป็นสีเทา
                 submitButton.prop('disabled', true).css('background-color', '#ccc');
 
@@ -115,7 +116,7 @@
                 var row = $(this).closest('tr'); // ค้นหาแถวที่ปุ่มถูกกด
                 var submitButton = row.find('.save-btn'); // ค้นหาปุ่มบันทึกในแถวเดียวกัน
                 var proofInput = row.find(
-                'input[name="ProofOfReceive"]'); // ค้นหาช่องกรอกข้อมูลในแถวเดียวกัน
+                    'input[name="ProofOfReceive"]'); // ค้นหาช่องกรอกข้อมูลในแถวเดียวกัน
                 var editButton = row.find('.edit-btn'); // ค้นหาปุ่มแก้ไขในแถวเดียวกัน
 
                 // เปิดใช้งานปุ่มบันทึก และเปลี่ยนเป็นสีเขียว
@@ -131,3 +132,8 @@
     </script>
 
 @endsection
+@if (session('success'))
+    <script>
+        alert('บันทึกเรียบร้อยแล้ว');
+    </script>
+@endif
